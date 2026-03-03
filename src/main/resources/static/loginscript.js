@@ -3,7 +3,7 @@ async function handleLogin() {
     const spinner = document.getElementById('spinner');
     const btnText = document.getElementById('btnText');
     const msgEl = document.getElementById('waitingMessage');
-    const email = document.getElementById('emailAddress').value.trim();
+    const emailAccount = document.getElementById('emailAddress').value.trim();
     const password = document.getElementById('Userpassword').value;
 
     // Basic client-side guard
@@ -21,16 +21,16 @@ async function handleLogin() {
         const response = await fetch('http://localhost:8080/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ emailAccount, password }),
         });
 
         if (response.ok) {
             // ── Success ─────────────────────────────────────────────
-            btnText.textContent = '✓ Success';
+            btnText.textContent = 'Success';
             btn.classList.remove('loading');
             msgEl.textContent = '';
             // Redirect or handle success here
-            // window.location.href = '/dashboard';
+            window.location.href = '/home';
         } else {
             // ── Invalid credentials ──────────────────────────────────
             showError(btn, btnText, msgEl);
