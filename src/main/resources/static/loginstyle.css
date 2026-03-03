@@ -1,0 +1,278 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --text: #3c4647;
+    --green: #3faa1c;
+    --green-dark: #2d8a13;
+    --muted: #6c7272;
+    --form-bg: #f4f2ee;
+    --page-bg: #eceae5;
+    --border: #dddad4;
+    --error: #d93025;
+    --white: #ffffff;
+}
+
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Mulish', sans-serif;
+    background: var(--page-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* Decorative background blobs */
+.bg-shape {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.shape-1 {
+    width: 340px;
+    height: 340px;
+    background: radial-gradient(circle, #a8e89c, transparent);
+    top: -80px;
+    right: -80px;
+}
+
+.shape-2 {
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(circle, #c5e8be, transparent);
+    bottom: -60px;
+    left: -60px;
+}
+
+/* Card */
+.container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 400px;
+    padding: 16px;
+}
+
+form {
+    background: var(--form-bg);
+    border-radius: 20px;
+    padding: 36px 32px 32px;
+    box-shadow:
+        0 4px 24px rgba(60, 70, 71, 0.10),
+        0 1px 4px rgba(60, 70, 71, 0.06);
+    border: 1px solid var(--border);
+    animation: fadeUp 0.5s ease both;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Brand */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 28px;
+}
+
+.brand-icon {
+    font-size: 22px;
+    color: var(--green);
+    line-height: 1;
+}
+
+.brand-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+}
+
+/* Heading */
+.signup span {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.5px;
+    display: block;
+}
+
+.signup .sub {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 300;
+    margin-top: 4px;
+    margin-bottom: 28px;
+}
+
+/* Fields */
+.credentials {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+label {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+}
+
+.input-wrap {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: var(--muted);
+    pointer-events: none;
+}
+
+input {
+    width: 100%;
+    padding: 13px 14px 13px 38px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--white);
+    font-family: 'Mulish', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+}
+
+input::placeholder {
+    color: #b0afab;
+}
+
+input:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(63, 170, 28, 0.12);
+}
+
+/* Actions */
+.actions {
+    margin-top: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 15px;
+    background: var(--green);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 4px 14px rgba(63, 170, 28, 0.30);
+    height: 52px;
+}
+
+button[type="submit"]:hover:not(:disabled) {
+    background: var(--green-dark);
+    box-shadow: 0 6px 18px rgba(63, 170, 28, 0.38);
+}
+
+button[type="submit"]:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+button[type="submit"]:disabled {
+    cursor: not-allowed;
+}
+
+button.error-state {
+    background: var(--error) !important;
+    box-shadow: 0 4px 14px rgba(217, 48, 37, 0.30) !important;
+}
+
+/* Spinner */
+.spinner {
+    display: none;
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+button.loading .spinner {
+    display: block;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Waiting message */
+.waiting-message {
+    font-size: 12.5px;
+    color: var(--muted);
+    text-align: center;
+    min-height: 18px;
+    font-weight: 400;
+    transition: opacity 0.3s;
+    letter-spacing: 0.01em;
+}
+
+.waiting-message.error-text {
+    color: var(--error);
+    font-weight: 500;
+}
