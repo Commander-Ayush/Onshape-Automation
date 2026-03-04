@@ -18,10 +18,10 @@ async function handleLogin() {
     msgEl.textContent = 'This might take 10–12 seconds, please wait.';
 
     try {
-        const response = await fetch('http://localhost:8080/login-form', {
+        const response = await fetch('/login-form', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ emailAccount, password }),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ emailAccount, password }),
         });
 
         if (response.ok) {

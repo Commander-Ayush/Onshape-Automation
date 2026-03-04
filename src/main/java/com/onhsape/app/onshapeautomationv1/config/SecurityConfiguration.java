@@ -16,7 +16,7 @@ public class SecurityConfiguration {
         http
                 .csrf(csrf -> csrf.disable()) // keep simple for now
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/").permitAll().requestMatchers("/static/**", "/*.css", "/*.js").permitAll()
+                        .requestMatchers("/login", "/login-form","/").permitAll().requestMatchers("/static/**", "/*.css", "/*.js").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
