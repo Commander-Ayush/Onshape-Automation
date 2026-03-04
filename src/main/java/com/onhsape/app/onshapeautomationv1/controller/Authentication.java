@@ -7,10 +7,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -25,6 +22,7 @@ public class Authentication {
     }
 
     @PostMapping("/login-form")
+    @ResponseBody
     public ResponseEntity<String> authenticate(@RequestParam String emailAccount, @RequestParam String password, HttpServletRequest request){
         if (isValidUser(emailAccount, password)) {
 
