@@ -202,7 +202,7 @@ input:focus {
     gap: 12px;
 }
 
-button[type="submit"] {
+button#submitBtn {
     width: 100%;
     padding: 15px;
     background: var(--green);
