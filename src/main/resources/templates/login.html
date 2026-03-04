@@ -6,72 +6,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sign In — Onshape</title>
     <link
-        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=Mulish:wght@300;400;500&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="/loginstyle.css">
+            href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=Mulish:wght@300;400;500&display=swap"
+            rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/loginstyle.css}">
 </head>
 
 <body>
 
-    <div class="bg-shape shape-1"></div>
-    <div class="bg-shape shape-2"></div>
+<div class="bg-shape shape-1"></div>
+<div class="bg-shape shape-2"></div>
 
-    <div class="container">
-        <form action="/login-form" method="post" id="loginForm" onsubmit="return false;">
+<div class="container">
+    <form action="/login-form" method="post" id="loginForm" onsubmit="return false;">
 
-            <div class="brand">
-                <div class="brand-icon">⬡</div>
-                <span class="brand-name">Onshape</span>
-            </div>
+        <div class="brand">
+            <div class="brand-icon">⬡</div>
+            <span class="brand-name">Graphics Auto</span>
+        </div>
 
-            <div class="signup">
-                <span>Sign up</span>
-                <p class="sub">Access your workspace</p>
-            </div>
+        <div class="signup">
+            <span>Sign up</span>
+            <p class="sub">Your assignments buddy 😉</p>
+        </div>
 
-            <div class="credentials">
-                <div class="field-group">
-                    <label id="emailLabel" for="emailAddress">Onshape email</label>
-                    <div class="input-wrap">
-                        <svg class="input-icon" viewBox="0 0 20 20" fill="none">
-                            <path
+        <div class="credentials">
+            <div class="field-group">
+                <label id="emailLabel" for="emailAddress">Onshape email</label>
+                <div class="input-wrap">
+                    <svg class="input-icon" viewBox="0 0 20 20" fill="none">
+                        <path
                                 d="M2.5 5.5A1.5 1.5 0 014 4h12a1.5 1.5 0 011.5 1.5v9A1.5 1.5 0 0116 16H4a1.5 1.5 0 01-1.5-1.5v-9z"
                                 stroke="currentColor" stroke-width="1.2" />
-                            <path d="M2.5 6l7.5 5 7.5-5" stroke="currentColor" stroke-width="1.2"
-                                stroke-linecap="round" />
-                        </svg>
-                        <input type="email" id="emailAddress" name="email" placeholder="your@email.com"
-                            autocomplete="email" required>
-                    </div>
-                </div>
-
-                <div class="field-group">
-                    <label id="passwordLabel" for="Userpassword">Onshape password</label>
-                    <div class="input-wrap">
-                        <svg class="input-icon" viewBox="0 0 20 20" fill="none">
-                            <rect x="4" y="9" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2" />
-                            <path d="M7 9V6.5a3 3 0 016 0V9" stroke="currentColor" stroke-width="1.2"
-                                stroke-linecap="round" />
-                            <circle cx="10" cy="13" r="1" fill="currentColor" />
-                        </svg>
-                        <input type="password" id="Userpassword" name="password" placeholder="••••••••"
-                            autocomplete="current-password" required>
-                    </div>
+                        <path d="M2.5 6l7.5 5 7.5-5" stroke="currentColor" stroke-width="1.2"
+                              stroke-linecap="round" />
+                    </svg>
+                    <input type="email" id="emailAddress" name="email" placeholder="Your Onshape email"
+                           autocomplete="email" required>
                 </div>
             </div>
 
-            <div class="actions">
-                <button type="submit" id="submitBtn" onclick="handleLogin()">
-                    <span class="spinner" id="spinner"></span>
-                    <span class="btn-text" id="btnText">Sign up</span>
-                </button>
-                <span class="waiting-message" id="waitingMessage"></span>
+            <div class="field-group">
+                <label id="passwordLabel" for="Userpassword">Onshape password</label>
+                <div class="input-wrap">
+                    <svg class="input-icon" viewBox="0 0 20 20" fill="none">
+                        <rect x="4" y="9" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2" />
+                        <path d="M7 9V6.5a3 3 0 016 0V9" stroke="currentColor" stroke-width="1.2"
+                              stroke-linecap="round" />
+                        <circle cx="10" cy="13" r="1" fill="currentColor" />
+                    </svg>
+                    <input type="password" id="Userpassword" name="password" placeholder="Your Onshape password"
+                           autocomplete="current-password" required>
+                </div>
             </div>
+        </div>
 
-        </form>
-    </div>
+        <div class="actions">
+            <button type="submit" id="submitBtn" onclick="handleLogin()">
+                <span class="spinner" id="spinner"></span>
+                <span class="btn-text" id="btnText">Sign up</span>
+            </button>
+            <span class="waiting-message" id="waitingMessage"></span>
+        </div>
 
-    <script src="/loginscript.js"></script>
+    </form>
+</div>
+
+<script th:src="@{/loginscript.js}"></script>
 </body>
 
 </html>

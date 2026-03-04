@@ -28,36 +28,23 @@ public class Authentication {
     public ResponseEntity<String> authenticate(@RequestParam String emailAccount, @RequestParam String password, HttpServletRequest request){
         if (isValidUser(emailAccount, password)) {
 
-            UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                             emailAccount,
                             null,
-                            List.of(new SimpleGrantedAuthority("USER"))
-                    );
+                            List.of(new SimpleGrantedAuthority("USER")));
 
             SecurityContextHolder.getContext().setAuthentication(auth);
-
             request.getSession(true); // create session
-
             return new ResponseEntity<>("Success", HttpStatus.OK);
         }
-
         return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
     }
 
     private boolean isValidUser(String emailAccount, String password) {
-
         try {
+            ProcessBuilder builder = new ProcessBuilder("node", "login.js", emailAccount, password);
 
-            ProcessBuilder builder = new ProcessBuilder(
-                    "node",
-                    "login.js",
-                    emailAccount,
-                    password
-            );
-
-            builder.redirectErrorStream(true); // merge error + normal output
-
+            builder.redirectErrorStream(true);
             Process process = builder.start();
 
             BufferedReader reader = new BufferedReader(
@@ -66,18 +53,13 @@ public class Authentication {
 
             String line;
             boolean success = false;
-
             while ((line = reader.readLine()) != null) {
-
                 System.out.println("Node Output: " + line);
-
                 if (line.contains("Login Successful")) {
                     success = true;
                 }
             }
-
-            process.waitFor(); // wait until script finishes
-
+            process.waitFor();
             return success;
 
         } catch (Exception e) {

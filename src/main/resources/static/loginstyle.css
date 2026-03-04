@@ -157,6 +157,7 @@ label {
     position: relative;
 }
 
+
 .input-icon {
     position: absolute;
     left: 13px;
@@ -189,6 +190,7 @@ input::placeholder {
 input:focus {
     border-color: var(--green);
     box-shadow: 0 0 0 3px rgba(63, 170, 28, 0.12);
+    font-weight: 500;
 }
 
 /* Actions */

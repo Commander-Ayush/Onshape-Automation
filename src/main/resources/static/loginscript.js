@@ -7,7 +7,7 @@ async function handleLogin() {
     const password = document.getElementById('Userpassword').value;
 
     // Basic client-side guard
-    if (!email || !password) return;
+    if (!emailAccount || !password) return;
 
     // ── Loading state ──────────────────────────────────────────
     btn.disabled = true;
@@ -18,7 +18,7 @@ async function handleLogin() {
     msgEl.textContent = 'This might take 10–12 seconds, please wait.';
 
     try {
-        const response = await fetch('http://localhost:8080/login', {
+        const response = await fetch('http://localhost:8080/login-form', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ emailAccount, password }),
