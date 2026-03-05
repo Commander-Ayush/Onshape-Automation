@@ -1,5 +1,5 @@
 const express = require("express");
-const pLimit = require("p-limit");
+const pLimit = require("p-limit").default;
 const { login } = require("./LoginAutomation");
 
 const app = express();
