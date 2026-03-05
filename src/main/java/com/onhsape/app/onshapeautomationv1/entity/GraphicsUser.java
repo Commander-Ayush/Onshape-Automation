@@ -18,4 +18,11 @@ public class GraphicsUser {
     private String emailAccount;
 
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER; // default role
+
+    public enum Role {
+        USER, ADMIN}
 }

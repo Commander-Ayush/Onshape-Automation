@@ -1,5 +1,6 @@
 package com.onhsape.app.onshapeautomationv1.component;
 
+import jakarta.annotation.PreDestroy;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +10,8 @@ import java.io.InputStreamReader;
 
 @Component
 public class NodeAutomationStarter implements CommandLineRunner {
+
+    private Process process;
 
     @Override
     public void run(String... args) throws Exception {
@@ -22,7 +25,7 @@ public class NodeAutomationStarter implements CommandLineRunner {
         builder.redirectErrorStream(true);
         builder.inheritIO();
 
-        Process process = builder.start();
+        process = builder.start();
 
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(process.getInputStream())
@@ -38,5 +41,13 @@ public class NodeAutomationStarter implements CommandLineRunner {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        if (process != null && process.isAlive()) {
+            process.destroy();
+            System.out.println("[NODE SERVER] Stopped.");
+        }
     }
 }

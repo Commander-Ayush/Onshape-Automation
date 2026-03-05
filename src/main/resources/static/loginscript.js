@@ -24,13 +24,12 @@ async function handleLogin() {
             body: JSON.stringify({ emailAccount: emailAccount, password: password }),
         });
 
+
         if (response.ok) {
-            // ── Success ─────────────────────────────────────────────
-            btnText.textContent = 'Success';
+            const redirectUrl = await response.text(); // "/home" or "/admin"
+            btnText.textContent = 'Success!';
             btn.classList.remove('loading');
-            msgEl.textContent = '';
-            // Redirect or handle success here
-            window.location.href = '/home';
+            window.location.href = redirectUrl;
         } else {
             // ── Invalid credentials ──────────────────────────────────
             showError(btn, btnText, msgEl);
