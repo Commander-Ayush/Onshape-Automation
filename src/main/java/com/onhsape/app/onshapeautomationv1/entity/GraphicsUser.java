@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @Table(name = "users")
-public class User {
+public class GraphicsUser {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
