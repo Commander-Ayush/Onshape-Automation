@@ -31,35 +31,49 @@ public class Authentication {
         return "login";
     }
 
+    // Authentication.java - updated authenticate() method
     @PostMapping("/login-form")
     @ResponseBody
-    public ResponseEntity<String> authenticate(@RequestBody GraphicsUser graphicsUser, HttpServletRequest request){
+    public ResponseEntity<String> authenticate(@RequestBody GraphicsUser graphicsUser,
+                                               HttpServletRequest request) {
 
-        String emailAccount = graphicsUser.getEmailAccount();
+        String email = graphicsUser.getEmailAccount();
         String password = graphicsUser.getPassword();
 
-        if (isValidUser(emailAccount, password)) {
-
-            UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(
-                            emailAccount,
-                            null,
-                            List.of(new SimpleGrantedAuthority("USER"))
-                    );
-
-            SecurityContextHolder.getContext().setAuthentication(auth);
-
-            request.getSession(true).setAttribute(
-                    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                    SecurityContextHolder.getContext()
-            );
-
-            userRepository.save(graphicsUser);
-            return ResponseEntity.ok("Success");
+        if (!isValidUser(email, password)) {
+            return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
-    }
 
+        // Find existing user or create new one with default USER role
+        GraphicsUser user = userRepository.findByEmailAccount(email)
+                .orElseGet(() -> {
+                    GraphicsUser newUser = new GraphicsUser();
+                    newUser.setEmailAccount(email);
+                    newUser.setPassword(password);
+                    newUser.setRole(GraphicsUser.Role.USER);
+                    return userRepository.save(newUser);
+                });
+
+        // Build authority from DB role
+        String authority = "ROLE_" + user.getRole().name(); // "ROLE_USER" or "ROLE_ADMIN"
+
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(
+                        email,
+                        null,
+                        List.of(new SimpleGrantedAuthority(authority))
+                );
+
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        request.getSession(true).setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                SecurityContextHolder.getContext()
+        );
+
+        // Redirect based on role
+        String redirectUrl = user.getRole() == GraphicsUser.Role.ADMIN ? "/admin" : "/home";
+        return ResponseEntity.ok(redirectUrl);
+    }
     private boolean isValidUser(String emailAccount, String password) {
 
         try {

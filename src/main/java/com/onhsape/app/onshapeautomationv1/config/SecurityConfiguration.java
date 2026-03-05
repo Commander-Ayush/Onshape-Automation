@@ -13,18 +13,19 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
+        // SecurityConfiguration.java
         http
-                .csrf(csrf -> csrf.disable()) // keep simple for now
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/login-form", "/").permitAll()
                         .requestMatchers("/static/**", "/*.css", "/*.js").permitAll()
-                        .requestMatchers("/home").authenticated()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")   // ADMIN only
+                        .requestMatchers("/home").hasAnyRole("USER", "ADMIN")      // USER only
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((req, res, ex2) -> {
-                            res.sendRedirect("/login");
-                        })
+                        .authenticationEntryPoint((req, res, ex2) -> res.sendRedirect("/login"))
+                        .accessDeniedHandler((req, res, ex2) -> res.sendRedirect("/login")) // wrong role → back to login
                 );
 
         return http.build();
