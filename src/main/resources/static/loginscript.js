@@ -20,8 +20,8 @@ async function handleLogin() {
     try {
         const response = await fetch('/login-form', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ emailAccount, password }),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ emailAccount: emailAccount, password: password }),
         });
 
         if (response.ok) {
@@ -58,3 +58,31 @@ function showError(btn, btnText, msgEl, customMessage) {
         btn.classList.remove('error-state');
     }, 2500);
 }
+
+const input1 = document.getElementById("emailAddress");
+const input2 = document.getElementById("Userpassword");
+
+input1.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        input2.focus();
+    }
+});
+
+input2.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        handleLogin();
+    }
+});
+
+const passwordInput = document.getElementById("Userpassword");
+const toggleBtn = document.getElementById("togglePassword");
+
+toggleBtn.addEventListener("click", function () {
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+    } else {
+        passwordInput.type = "password";
+    }
+});

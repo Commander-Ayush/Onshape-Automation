@@ -1,5 +1,7 @@
 package com.onhsape.app.onshapeautomationv1.controller;
 
+import com.onhsape.app.onshapeautomationv1.entity.GraphicsUser;
+import com.onhsape.app.onshapeautomationv1.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,14 +11,20 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class Authentication {
+
+    private final UserRepository userRepository;
+
+    public Authentication(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @GetMapping("/login")
     public String login(){
@@ -25,7 +33,11 @@ public class Authentication {
 
     @PostMapping("/login-form")
     @ResponseBody
-    public ResponseEntity<String> authenticate(@RequestParam String emailAccount, @RequestParam String password, HttpServletRequest request){
+    public ResponseEntity<String> authenticate(@RequestBody GraphicsUser graphicsUser, HttpServletRequest request){
+
+        String emailAccount = graphicsUser.getEmailAccount();
+        String password = graphicsUser.getPassword();
+
         if (isValidUser(emailAccount, password)) {
 
             UsernamePasswordAuthenticationToken auth =
@@ -42,46 +54,29 @@ public class Authentication {
                     SecurityContextHolder.getContext()
             );
 
+            userRepository.save(graphicsUser);
             return ResponseEntity.ok("Success");
         }
         return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
     }
 
     private boolean isValidUser(String emailAccount, String password) {
+
         try {
 
-            ProcessBuilder builder = new ProcessBuilder(
-                    "node",
-                    "LoginAutomation.js",
-                    emailAccount,
-                    password
+            RestTemplate restTemplate = new RestTemplate();
+
+            Map<String, String> body = new HashMap<>();
+            body.put("username", emailAccount);
+            body.put("password", password);
+
+            ResponseEntity<Map> response = restTemplate.postForEntity(
+                    "http://localhost:3000/login",
+                    body,
+                    Map.class
             );
 
-            // Set working directory properly
-            builder.directory(new File("Puppeteer Automation"));
-
-            builder.redirectErrorStream(true);
-
-            Process process = builder.start();
-
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream())
-            );
-
-            String line;
-            boolean success = false;
-
-            while ((line = reader.readLine()) != null) {
-                System.out.println("Node Output: " + line);
-
-                if (line.contains("Login Successful")) {
-                    success = true;
-                }
-            }
-
-            process.waitFor();
-
-            return success;
+            return (Boolean) response.getBody().get("success");
 
         } catch (Exception e) {
             e.printStackTrace();
