@@ -1,38 +1,112 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin — Graphics Auto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/adminstyle.css}">
 </head>
 
 <body>
-    <h1>this is an admin page</h1>
-    <form id="assignmentUploader">
-        <div class="inputs">
-            <label for="nameOfAssignment">Name:</label>
-            <input type="text" placeholder="Name">
 
-            <label for="dimensionOfAssignment">Dimension:</label>
-            <input type="text" placeholder="Dimension">
+<div class="bg-shape shape-1"></div>
+<div class="bg-shape shape-2"></div>
 
-            <label for="collegeOfAssignment">College:</label>
-            <input type="text" placeholder="College">
-
-            <label for="branchOfAssignment">Branch:</label>
-            <input type="text" placeholder="Branch">
-
-            <label for="priceOfAssignment">Price:</label>
-            <input type="text" placeholder="Price">
-
-            <label for="automatoinOFAssignment">Automation name:</label>
-            <input type="text" placeholder="Automation Name">
+<!-- HEADER -->
+<header>
+    <div class="header-inner">
+        <div class="brand">
+            <div class="brand-icon">⬡</div>
+            <div class="brand-text">
+                <h1>Graphics Auto</h1>
+                <span class="tagline">Admin Panel</span>
+            </div>
         </div>
-        <button type="button" onclick=uploadAssignment()>Submit</button>
-    </form>
+        <span class="admin-badge">ADMIN</span>
+    </div>
+</header>
 
+<!-- MAIN -->
+<main class="page-main">
+
+    <div class="card">
+        <div class="card-header">
+            <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
+                <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+            <span>Upload Assignment</span>
+        </div>
+
+        <form id="assignmentUploader">
+            <div class="inputs">
+
+                <div class="field-group">
+                    <label for="name">Name</label>
+                    <input type="text" placeholder="Assignment name" id="name">
+                </div>
+
+                <div class="field-group">
+                    <label for="dimension">Dimension</label>
+                    <input type="text" placeholder="e.g. A4, A3, 24×36" id="dimension">
+                </div>
+
+                <div class="field-row">
+                    <div class="field-group">
+                        <label for="college">College</label>
+                        <div class="select-wrap">
+                            <select id="college">
+                                <option value="">Select</option>
+                                <option value="MAIT">MAIT</option>
+                                <option value="MSIT">MSIT</option>
+                                <option value="BVCOE">BVCOE</option>
+                                <option value="ADGIPS">ADGIPS</option>
+                                <option value="HMR">HMR</option>
+                            </select>
+                            <svg class="select-arrow" viewBox="0 0 20 20" fill="none">
+                                <path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="branch">Branch</label>
+                        <input type="text" placeholder="e.g. CSE, IT" id="branch">
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-group">
+                        <label for="price">Price</label>
+                        <div class="input-prefix-wrap">
+                            <span class="input-prefix">₹</span>
+                            <input type="text" placeholder="0.00" id="price">
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="automationName">Automation Name</label>
+                        <input type="text" placeholder="Script / file name" id="automationName">
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-footer">
+                <span class="waiting-message" id="waitingMessage"></span>
+                <button type="button" id="submitBtn" onclick="uploadAssignment()">
+                    <span class="spinner" id="spinner"></span>
+                    <span class="btn-text" id="btnText">Submit</span>
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</main>
+
+<script th:src="@{/adminscript.js}"></script>
 
 </body>
-<script src="adminscript.js"></script>
-
 </html>

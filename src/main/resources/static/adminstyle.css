@@ -1,0 +1,332 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --text:        #3c4647;
+    --green:       #3faa1c;
+    --green-dark:  #2d8a13;
+    --green-soft:  rgba(63, 170, 28, 0.10);
+    --muted:       #6c7272;
+    --page-bg:     #eceae5;
+    --card-bg:     #f4f2ee;
+    --white:       #ffffff;
+    --border:      #dddad4;
+    --error:       #d93025;
+    --header-h:    64px;
+}
+
+html, body {
+    min-height: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    font-family: 'Mulish', sans-serif;
+    background: var(--page-bg);
+    color: var(--text);
+}
+
+/* ── Background blobs ── */
+.bg-shape {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.28;
+    pointer-events: none;
+    z-index: 0;
+}
+.shape-1 {
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, #a8e89c, transparent);
+    top: -80px; right: -60px;
+}
+.shape-2 {
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, #c5e8be, transparent);
+    bottom: 60px; left: -60px;
+}
+
+/* ── Header ── */
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(244, 242, 238, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    height: var(--header-h);
+}
+
+.header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    height: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand-icon {
+    font-size: 24px;
+    color: var(--green);
+    line-height: 1;
+}
+
+.brand-text h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    line-height: 1.1;
+}
+
+.tagline {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 300;
+}
+
+.admin-badge {
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--green-dark);
+    background: var(--green-soft);
+    border: 1px solid rgba(63, 170, 28, 0.2);
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+/* ── Main ── */
+.page-main {
+    position: relative;
+    z-index: 1;
+    padding: 24px 16px 60px;
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+/* ── Card ── */
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(60, 70, 71, 0.08);
+    animation: fadeUp 0.45s ease both;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 18px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.card-header svg {
+    color: var(--green);
+    flex-shrink: 0;
+}
+
+/* ── Form ── */
+#assignmentUploader {
+    padding: 20px 20px 0;
+}
+
+.inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* two-col row */
+.field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+label {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+}
+
+input, select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--white);
+    font-family: 'Mulish', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input::placeholder {
+    color: #b5b2ac;
+}
+
+input:focus, select:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(63, 170, 28, 0.12);
+}
+
+/* Select dropdown */
+.select-wrap {
+    position: relative;
+}
+
+.select-arrow {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 15px;
+    color: var(--muted);
+    pointer-events: none;
+}
+
+/* Price prefix */
+.input-prefix-wrap {
+    position: relative;
+}
+
+.input-prefix {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    pointer-events: none;
+}
+
+.input-prefix-wrap input {
+    padding-left: 26px;
+}
+
+/* ── Form footer ── */
+.form-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 20px 0 20px;
+}
+
+.waiting-message {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    min-height: 16px;
+    transition: opacity 0.3s;
+}
+
+.waiting-message.error-text {
+    color: var(--error);
+    font-weight: 500;
+}
+
+.waiting-message.success-text {
+    color: var(--green-dark);
+    font-weight: 500;
+}
+
+/* Submit button */
+#submitBtn {
+    width: 100%;
+    padding: 15px;
+    background: var(--green);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 52px;
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 4px 14px rgba(63, 170, 28, 0.30);
+}
+
+#submitBtn:hover:not(:disabled) {
+    background: var(--green-dark);
+    box-shadow: 0 6px 18px rgba(63, 170, 28, 0.38);
+}
+
+#submitBtn:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+#submitBtn:disabled {
+    cursor: not-allowed;
+    opacity: 0.75;
+}
+
+#submitBtn.error-state {
+    background: var(--error) !important;
+    box-shadow: 0 4px 14px rgba(217, 48, 37, 0.28) !important;
+}
+
+/* Spinner */
+.spinner {
+    display: none;
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid rgba(255,255,255,0.35);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+#submitBtn.loading .spinner {
+    display: block;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

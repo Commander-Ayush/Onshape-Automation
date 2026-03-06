@@ -9,6 +9,8 @@ public interface AssignmentService {
 
     List<Assignment> getAllAssignments();
 
+    void saveAssignment(Assignment assignment);
+
 
 
 }
