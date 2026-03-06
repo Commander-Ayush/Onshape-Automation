@@ -17,4 +17,9 @@ public class AssignmentServiceImpl implements AssignmentService{
     public List<Assignment> getAllAssignments() {
         return assignmentRepo.findAll();
     }
+
+    @Override
+    public void saveAssignment(Assignment assignment) {
+        assignmentRepo.save(assignment);
+    }
 }
