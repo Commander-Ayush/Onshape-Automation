@@ -7,15 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 
 // AdminController.java
 @Controller
-@RequestMapping("/admin")
 public class AdminController {
 
     @Autowired
@@ -25,15 +21,15 @@ public class AdminController {
         this.assignmentServiceImpl = assignmentServiceImpl;
     }
 
-    @GetMapping("/")
+    @GetMapping("/admin")
     public String admin(Model model) {
         return "admin"; // maps to templates/admin.html
     }
 
 
-    @PostMapping("/assignment-upload")
+    @PostMapping("/admin/assignment-upload")
     @ResponseBody
-    public ResponseEntity<String> assignmentUpload(Assignment assignment) {
+    public ResponseEntity<String> assignmentUpload(@RequestBody Assignment assignment) {
 
         try{
             assignmentServiceImpl.saveAssignment(assignment);

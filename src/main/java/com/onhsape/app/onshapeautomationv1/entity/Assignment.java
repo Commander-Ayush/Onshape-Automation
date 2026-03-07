@@ -26,7 +26,7 @@ public class Assignment {
 
     private String branchOfAssignment;
 
-    private int priceOfAssignment;
+    private Integer priceOfAssignment;
 
     private String automationName;
 

@@ -1,23 +1,41 @@
 const puppeteer = require("puppeteer");
 
-let browser = null;
+let loginBrowser = null;
+let automationBrowser = null;
 
-async function getBrowser() {
+async function getLoginBrowser() {
 
-    if (!browser) {
-        browser = await puppeteer.launch({
+    if (!loginBrowser) {
+
+        loginBrowser = await puppeteer.launch({
             headless: true,
-            defaultViewport: {
-                width: 1366,
-                height: 768
-            },
+            defaultViewport: { width: 1366, height: 768 },
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
 
-        console.log("Browser Started");
+        console.log("Login Browser Started");
     }
 
-    return browser;
+    return loginBrowser;
 }
 
-module.exports = { getBrowser };
+async function getAutomationBrowser() {
+
+    if (!automationBrowser) {
+
+        automationBrowser = await puppeteer.launch({
+            headless: true,
+            defaultViewport: { width: 1366, height: 768 },
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+
+        console.log("Automation Browser Started");
+    }
+
+    return automationBrowser;
+}
+
+module.exports = {
+    getLoginBrowser,
+    getAutomationBrowser
+};

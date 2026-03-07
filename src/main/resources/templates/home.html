@@ -93,10 +93,10 @@
                     </div>
                     <div class="detail-row price-row">
                         <span class="detail-label">Price</span>
-                        <span class="price-value" th:text="${assignment.priceOfAssignment}">—</span>
+                        <span class="price-value">₹<span th:text="${assignment.priceOfAssignment}">—</span></span>
                     </div>
                 </div>
-                <button type="button" class="buy-btn">Buy Now</button>
+                <button type="button" class="buy-btn">Get Now</button>
             </div>
 
         </div>
@@ -126,6 +126,7 @@
     </main>
 
     <script th:src="@{/homescript.js}"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </body>
 
 </html>
