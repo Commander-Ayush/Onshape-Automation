@@ -1,14 +1,21 @@
 async function uploadAssignment() {
-    const btn     = document.getElementById('submitBtn');
+    const btn = document.getElementById('submitBtn');
     const btnText = document.getElementById('btnText');
-    const msgEl   = document.getElementById('waitingMessage');
+    const msgEl = document.getElementById('waitingMessage');
 
-    const name           = document.getElementById('name').value.trim();
-    const dimension      = document.getElementById('dimension').value.trim();
-    const college        = document.getElementById('college').value.trim();
-    const branch         = document.getElementById('branch').value.trim();
-    const price          = document.getElementById('price').value.trim();
+    const name = document.getElementById('name').value.trim();
+    const dimension = document.getElementById('dimension').value.trim();
+    const college = document.getElementById('college').value.trim();
+    const branch = document.getElementById('branch').value.trim();
+    const price = document.getElementById('price').value.trim();
     const automationName = document.getElementById('automationName').value.trim();
+
+    console.log(name);
+    console.log(dimension);
+    console.log(college);
+    console.log(branch);
+    console.log(price);
+    console.log(automationName);
 
     // Basic validation
     if (!name || !dimension || !college || !branch || !price || !automationName) {
@@ -76,7 +83,7 @@ function showError(btn, btnText, msgEl, message) {
 
 function showMessage(el, text, type) {
     el.className = 'waiting-message';
-    if (type === 'error')   el.classList.add('error-text');
+    if (type === 'error') el.classList.add('error-text');
     if (type === 'success') el.classList.add('success-text');
     el.textContent = text;
 }

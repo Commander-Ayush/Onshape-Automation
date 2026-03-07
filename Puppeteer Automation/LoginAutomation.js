@@ -1,10 +1,10 @@
-const { getBrowser } = require("./browserManager");
+const { getLoginBrowser } = require("./browserManager");
 
 async function login(username, user_password) {
 
     const startTime = Date.now();
 
-    const browser = await getBrowser();
+    const browser = await getLoginBrowser();
     const page = await browser.newPage();
 
     try {

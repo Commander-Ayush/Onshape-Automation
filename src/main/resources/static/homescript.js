@@ -25,3 +25,32 @@ function filterCards() {
         emptyState.style.display = visibleCount === 0 ? 'flex' : 'none';
     }
 }
+
+document.getElementById('buy-btn').onclick = function () {
+
+    const price = document.querySelector('.price-value').innerText;
+
+    fetch('http://localhost:8080/api/payments/create-order?amount=1000&currency=INR', {
+        method: 'POST'
+    })
+        .then(response => response.json())
+        .then(order => {
+            const options = {
+                key: "rzp_test_SNts8h8YVvKcQU", // Replace with your Razorpay API Key
+                amount: order.amount, // Amount in paise
+                currency: order.currency,
+                name: "Your Company",
+                description: "Test Transaction",
+                order_id: order.id,
+                handler: function (response) {
+                    alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
+                },
+                theme: {
+                    color: "#3399cc"
+                }
+            };
+            const rzp = new Razorpay(options);
+            rzp.open();
+        })
+        .catch(err => console.error(err));
+};
