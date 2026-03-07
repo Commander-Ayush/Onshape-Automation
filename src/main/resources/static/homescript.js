@@ -26,11 +26,11 @@ function filterCards() {
     }
 }
 
-document.getElementById('buy-btn').onclick = function () {
+document.querySelector('buy-btn').onclick = function () {
 
     const price = document.querySelector('.price-value').innerText;
 
-    fetch('http://localhost:8080/api/payments/create-order?amount=1000&currency=INR', {
+    fetch('/api/payment/create-order?amount=1000&currency=INR', {
         method: 'POST'
     })
         .then(response => response.json())

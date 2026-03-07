@@ -13,7 +13,7 @@ public class RazorPay implements  PayService {
     @Value("${razorpay.api.key}")
     private String apiKey;
 
-    @Value("${razorpay.api.secret")
+    @Value("${razorpay.api.secret}")
     private String apiSecret;
 
 
