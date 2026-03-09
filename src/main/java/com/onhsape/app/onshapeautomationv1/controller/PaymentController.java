@@ -1,28 +1,35 @@
 package com.onhsape.app.onshapeautomationv1.controller;
 
+import com.onhsape.app.onshapeautomationv1.entity.AssignmentOrder;
+import com.onhsape.app.onshapeautomationv1.service.PayService;
 import com.onhsape.app.onshapeautomationv1.service.RazorPay;
 import com.razorpay.RazorpayException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 @RequestMapping("/api/payment")
 public class PaymentController {
 
-    @Autowired
-    private RazorPay razorPay;
+    private PayService payService;
+
+    public PaymentController(PayService payService) {
+        this.payService = payService;
+    }
 
     @PostMapping("/create-order")
-    public String createOrder(@RequestParam int amount, @RequestParam String currency){
+    public ResponseEntity<?> createOrder(@RequestBody AssignmentOrder order)
+            throws RazorpayException {
 
         try{
-            return razorPay.createOrder(amount, currency, "r1");
-        } catch (RazorpayException e) {
-            throw new RuntimeException(e);
+            AssignmentOrder savedOrder = payService.createOrder(order);
+            return ResponseEntity.ok(savedOrder);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

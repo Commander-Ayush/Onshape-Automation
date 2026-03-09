@@ -26,31 +26,56 @@ function filterCards() {
     }
 }
 
-document.querySelector('buy-btn').onclick = function () {
+document.querySelectorAll(".buy-btn").forEach(button => {
 
-    const price = document.querySelector('.price-value').innerText;
+    button.onclick = async function () {
 
-    fetch('/api/payment/create-order?amount=1000&currency=INR', {
-        method: 'POST'
-    })
-        .then(response => response.json())
-        .then(order => {
-            const options = {
-                key: "rzp_test_SNts8h8YVvKcQU", // Replace with your Razorpay API Key
-                amount: order.amount, // Amount in paise
-                currency: order.currency,
-                name: "Your Company",
-                description: "Test Transaction",
-                order_id: order.id,
-                handler: function (response) {
-                    alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
-                },
-                theme: {
-                    color: "#3399cc"
-                }
-            };
-            const rzp = new Razorpay(options);
-            rzp.open();
-        })
-        .catch(err => console.error(err));
-};
+        const card = this.closest(".assignmentCard");
+
+        const price = card.querySelector(".price-value span").innerText;
+        const name = card.querySelector(".assignment-name").innerText;
+
+        const response = await fetch("/api/payment/create-order", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                automationName: name,
+                price: price
+            })
+        });
+
+        const order = await response.json();
+
+        const options = {
+
+            key: "rzp_test_SNts8h8YVvKcQU",
+
+            amount: order.price * 100,
+
+            currency: "INR",
+
+            name: "Graphics Auto",
+
+            description: "Order for " + order.automationName,
+
+            order_id: order.razorpayOrderId,
+
+            handler: function (response) {
+
+                alert("Payment successful " + response.razorpay_payment_id);
+
+            }
+
+        };
+
+        const rzp = new Razorpay(options);
+
+        rzp.open();
+    };
+
+});

@@ -1,24 +1,27 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
 :root {
-    --text:        #3c4647;
-    --green:       #3faa1c;
-    --green-dark:  #2d8a13;
-    --green-soft:  rgba(63, 170, 28, 0.10);
-    --muted:       #6c7272;
-    --page-bg:     #eceae5;
-    --card-bg:     #f4f2ee;
-    --white:       #ffffff;
-    --border:      #dddad4;
-    --error:       #d93025;
-    --header-h:    64px;
+    --text: #3c4647;
+    --green: #3faa1c;
+    --green-dark: #2d8a13;
+    --green-soft: rgba(63, 170, 28, 0.10);
+    --muted: #6c7272;
+    --page-bg: #eceae5;
+    --card-bg: #f4f2ee;
+    --white: #ffffff;
+    --border: #dddad4;
+    --error: #d93025;
+    --header-h: 64px;
 }
 
-html, body {
+html,
+body {
     min-height: 100%;
     overflow-x: hidden;
 }
@@ -38,15 +41,21 @@ body {
     pointer-events: none;
     z-index: 0;
 }
+
 .shape-1 {
-    width: 320px; height: 320px;
+    width: 320px;
+    height: 320px;
     background: radial-gradient(circle, #a8e89c, transparent);
-    top: -80px; right: -60px;
+    top: -80px;
+    right: -60px;
 }
+
 .shape-2 {
-    width: 260px; height: 260px;
+    width: 260px;
+    height: 260px;
     background: radial-gradient(circle, #c5e8be, transparent);
-    bottom: 60px; left: -60px;
+    bottom: 60px;
+    left: -60px;
 }
 
 /* ── Header ── */
@@ -119,6 +128,14 @@ header {
     margin: 0 auto;
 }
 
+.totalEarning {
+    height: 20%;
+    width: 100%;
+    background: rgb(6, 14, 6);
+    color: #d3d3d3;
+    font-weight: 500;
+}
+
 /* ── Card ── */
 .card {
     background: var(--card-bg);
@@ -130,8 +147,15 @@ header {
 }
 
 @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .card-header {
@@ -183,7 +207,8 @@ label {
     color: var(--muted);
 }
 
-input, select {
+input,
+select {
     width: 100%;
     padding: 12px 14px;
     border: 1.5px solid var(--border);
@@ -202,7 +227,8 @@ input::placeholder {
     color: #b5b2ac;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
     border-color: var(--green);
     box-shadow: 0 0 0 3px rgba(63, 170, 28, 0.12);
 }
@@ -316,7 +342,7 @@ input:focus, select:focus {
     display: none;
     width: 18px;
     height: 18px;
-    border: 2.5px solid rgba(255,255,255,0.35);
+    border: 2.5px solid rgba(255, 255, 255, 0.35);
     border-top-color: #ffffff;
     border-radius: 50%;
     animation: spin 0.7s linear infinite;
@@ -328,5 +354,7 @@ input:focus, select:focus {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
