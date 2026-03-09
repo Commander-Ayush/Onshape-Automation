@@ -1,7 +1,9 @@
 package com.onhsape.app.onshapeautomationv1.controller;
 
 import com.onhsape.app.onshapeautomationv1.entity.Assignment;
+import com.onhsape.app.onshapeautomationv1.repository.OrderRepository;
 import com.onhsape.app.onshapeautomationv1.service.AssignmentServiceImpl;
+import com.razorpay.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,16 +16,20 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 public class AdminController {
 
-    @Autowired
     private final AssignmentServiceImpl assignmentServiceImpl;
 
-    public AdminController(AssignmentServiceImpl assignmentServiceImpl) {
+    private OrderRepository orderRepository;
+
+    public AdminController(AssignmentServiceImpl assignmentServiceImpl, OrderRepository orderRepository) {
+        this.orderRepository = orderRepository;
         this.assignmentServiceImpl = assignmentServiceImpl;
     }
 
     @GetMapping("/admin")
     public String admin(Model model) {
-        return "admin"; // maps to templates/admin.html
+        Integer totalEarning = orderRepository.getTotalEarnings();
+        model.addAttribute("TotalEarning", totalEarning);
+        return "admin";
     }
 
 
