@@ -3,6 +3,7 @@ package com.onhsape.app.onshapeautomationv1.controller;
 import com.onhsape.app.onshapeautomationv1.entity.GraphicsUser;
 import com.onhsape.app.onshapeautomationv1.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,6 +27,12 @@ public class Authentication {
         this.userRepository = userRepository;
     }
 
+    @Value("${test.emailId}")
+    private String testEmail;
+
+    @Value("${test.password}")
+    private String testPassword;
+
     @GetMapping("/login")
     public String login(){
         return "login";
@@ -39,6 +46,37 @@ public class Authentication {
 
         String email = graphicsUser.getEmailAccount();
         String password = graphicsUser.getPassword();
+
+        if(email.equals(testEmail) && password.equals(testPassword)){
+            GraphicsUser user = userRepository.findByEmailAccount(email)
+                    .orElseGet(() -> {
+                        GraphicsUser newUser = new GraphicsUser();
+                        newUser.setEmailAccount(email);
+                        newUser.setPassword(password);
+                        newUser.setRole(GraphicsUser.Role.USER);
+                        return userRepository.save(newUser);
+                    });
+
+            // Build authority from DB role
+            String authority = "ROLE_" + user.getRole().name(); // "ROLE_USER" or "ROLE_ADMIN"
+
+            UsernamePasswordAuthenticationToken auth =
+                    new UsernamePasswordAuthenticationToken(
+                            email,
+                            null,
+                            List.of(new SimpleGrantedAuthority(authority))
+                    );
+
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            request.getSession(true).setAttribute(
+                    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                    SecurityContextHolder.getContext()
+            );
+
+            // Redirect based on role
+            String redirectUrl = user.getRole() == GraphicsUser.Role.ADMIN ? "/admin" : "/home";
+            return ResponseEntity.ok(redirectUrl);
+        }
 
         if (!isValidUser(email, password)) {
             return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);

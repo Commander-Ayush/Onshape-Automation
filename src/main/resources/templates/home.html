@@ -68,13 +68,7 @@
                 th:attr="data-college=${assignment.collegeOfAssignment}">
                 <div class="assignmentImage">
                     <div class="img-placeholder">
-                        <svg viewBox="0 0 40 40" fill="none" width="36" height="36">
-                            <rect x="4" y="8" width="32" height="24" rx="3" stroke="currentColor" stroke-width="1.5" />
-                            <circle cx="14" cy="17" r="3" stroke="currentColor" stroke-width="1.5" />
-                            <path d="M4 28l8-6 6 5 5-4 9 7" stroke="currentColor" stroke-width="1.5"
-                                  stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        <span>No Image</span>
+                        <img th:src="${imageUrl}">
                     </div>
                 </div>
                 <div class="assignmentDetails">

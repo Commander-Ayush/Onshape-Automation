@@ -17,10 +17,10 @@ public class SecurityConfiguration {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/login-form", "/", "/home").permitAll()
+                        .requestMatchers("/login", "/login-form", "/", "/home", "/cloudinary/upload").permitAll()
                         .requestMatchers("/static/**", "/*.css", "/*.js").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")   // ADMIN only
-//                        .requestMatchers("/home").hasAnyRole("USER", "ADMIN")      // USER only
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+//                        .requestMatchers("/home").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
