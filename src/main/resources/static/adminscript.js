@@ -9,6 +9,8 @@ async function uploadAssignment() {
     const branch = document.getElementById('branch').value.trim();
     const price = document.getElementById('price').value.trim();
     const automationName = document.getElementById('automationName').value.trim();
+    const imageFile = document.getElementById('image').files[0];
+    const scriptFile = document.getElementById('scriptName').files[0];
 
     console.log(name);
     console.log(dimension);
@@ -34,14 +36,14 @@ async function uploadAssignment() {
     try {
         const response = await fetch('/admin/assignment-upload', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+                image:imageFile,
+                scriptFile: scriptFile,
                 nameOfAssignment: name,
                 dimensionOfAssignment: dimension,
                 collegeOfAssignment: college,
                 branchOfAssignment: branch,
-                priceOfAssignment: price,
-                automationName: automationName
+                priceOfAssignment: price
             })
         });
 

@@ -17,7 +17,7 @@ public class SecurityConfiguration {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/login-form", "/", "/home", "/cloudinary/upload").permitAll()
+                        .requestMatchers("/login", "/login-form", "/", "/home", "/admin","admin/cloudinary/upload").permitAll()
                         .requestMatchers("/static/**", "/*.css", "/*.js").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 //                        .requestMatchers("/home").hasAnyRole("USER", "ADMIN")

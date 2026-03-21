@@ -66,9 +66,7 @@ document.querySelectorAll(".buy-btn").forEach(button => {
             order_id: order.razorpayOrderId,
 
             handler: function (response) {
-
                 alert("Payment successful " + response.razorpay_payment_id);
-
             }
 
         };

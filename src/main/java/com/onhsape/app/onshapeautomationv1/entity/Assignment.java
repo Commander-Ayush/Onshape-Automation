@@ -30,5 +30,11 @@ public class Assignment {
 
     private String automationName;
 
+    private String imageURL;
+
+    private String imageName;
+
+    private String scriptFileName;
+
 
 }

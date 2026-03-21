@@ -413,3 +413,20 @@ select:focus {
 .assignmentCard.hidden {
     display: none;
 }
+
+.assignmentImage {
+    width: 100%;
+    overflow: hidden;
+}
+
+.img-placeholder {
+    width: 100%;
+    height: 200px;       /* set whatever fixed height you want */
+    overflow: hidden;
+}
+
+.img-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;   /* crops the image to fit without stretching */
+}
