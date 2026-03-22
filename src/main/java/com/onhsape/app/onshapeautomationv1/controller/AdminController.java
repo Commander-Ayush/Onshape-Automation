@@ -1,11 +1,13 @@
 package com.onhsape.app.onshapeautomationv1.controller;
 
 import com.onhsape.app.onshapeautomationv1.entity.Assignment;
+import com.onhsape.app.onshapeautomationv1.entity.Referral;
 import com.onhsape.app.onshapeautomationv1.repository.AssignmentRepo;
 import com.onhsape.app.onshapeautomationv1.repository.OrderRepository;
 import com.onhsape.app.onshapeautomationv1.service.AssignmentServiceImpl;
 import com.onhsape.app.onshapeautomationv1.service.ImageService;
 
+import com.onhsape.app.onshapeautomationv1.service.ReferralServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +24,12 @@ import java.util.Map;
 @Controller
 public class AdminController {
 
-    private final AssignmentRepo assignmentRepo;
     @Value("${file.upload.location}")
     private String scriptUploadDirectory;
+
+    private final AssignmentRepo assignmentRepo;
+
+    private final ReferralServiceImpl referralServiceImpl;
 
     private final AssignmentServiceImpl assignmentServiceImpl;
 
@@ -32,11 +37,12 @@ public class AdminController {
 
     private ImageService imageService;
 
-    public AdminController(AssignmentServiceImpl assignmentServiceImpl, OrderRepository orderRepository, ImageService imageService, AssignmentRepo assignmentRepo) {
+    public AdminController(AssignmentServiceImpl assignmentServiceImpl, OrderRepository orderRepository, ImageService imageService, AssignmentRepo assignmentRepo, ReferralServiceImpl referralServiceImpl) {
         this.orderRepository = orderRepository;
         this.imageService = imageService;
         this.assignmentServiceImpl = assignmentServiceImpl;
         this.assignmentRepo = assignmentRepo;
+        this.referralServiceImpl = referralServiceImpl;
     }
 
     @GetMapping("/admin")
@@ -88,6 +94,16 @@ public class AdminController {
 
             return new ResponseEntity<>("success", HttpStatus.CREATED);
         }catch(Exception e){
+            return new ResponseEntity<>("error", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("admin/referral-code")
+    public ResponseEntity<String> saveReferralCode(@RequestBody Referral referral) {
+        try{
+            referralServiceImpl.saveReferral(referral);
+            return new ResponseEntity<>("success", HttpStatus.OK);
+        }catch (Exception e){
             return new ResponseEntity<>("error", HttpStatus.BAD_REQUEST);
         }
     }

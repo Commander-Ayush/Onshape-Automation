@@ -61,6 +61,47 @@
     <!-- ASSIGNMENT GRID -->
     <main class="assignment-container">
 
+        <!-- ASSIGNMENT PURCHASE MODAL -->
+        <div class="modal-overlay" id="purchaseModal" onclick="if(event.target===this) closeModal()">
+            <div class="purchase-modal">
+                <button class="modal-close" onclick="closeModal()">✕</button>
+
+                <div class="modal-image-wrap">
+                    <img id="modalImage" src="" alt="Assignment Preview">
+                </div>
+
+                <div class="modal-body">
+                    <p class="modal-assignment-name" id="modalName">Assignment Name</p>
+
+                    <div class="modal-detail-row">
+                        <span class="modal-label">College</span>
+                        <span class="modal-college-badge" id="modalCollege">—</span>
+                    </div>
+
+                    <div class="modal-detail-row">
+                        <span class="modal-label">Price</span>
+                        <span class="modal-price" id="modalPrice">—</span>
+                    </div>
+
+                    <div class="modal-referral-wrap">
+                        <label class="modal-label" for="referralInput">Referral Code <span class="optional">(optional)</span></label>
+                        <input type="text" id="referralInput" class="referral-input" placeholder="Enter code if you have one">
+                        <button type="button" id="apply">Apply</button>
+                        <span class="referral-status" id="referralStatus"></span>
+                    </div>
+
+                    <button class="modal-buy-btn" id="modalBuyBtn" onclick="handleBuyNow()">
+                        <svg viewBox="0 0 20 20" fill="none" width="16" height="16">
+                            <path d="M4 4h13l-1.5 8H5.5L4 4z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <circle cx="8" cy="17" r="1.2" fill="currentColor"/>
+                            <circle cx="14" cy="17" r="1.2" fill="currentColor"/>
+                        </svg>
+                        Buy Now
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div class="grid" id="assignmentGrid">
 
             <!-- Cards are rendered by Thymeleaf via th:each -->
@@ -90,7 +131,7 @@
                         <span class="price-value">₹<span th:text="${assignment.priceOfAssignment}">—</span></span>
                     </div>
                 </div>
-                <button type="button" class="buy-btn">Get Now</button>
+                <button type="button" class="buy-btn" onclick="openModal(this)">Get Now</button>
             </div>
 
         </div>
