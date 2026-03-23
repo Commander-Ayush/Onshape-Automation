@@ -22,12 +22,7 @@ public class ReferralServiceImpl implements ReferralService{
 
     @Override
     public Optional<Referral> checkReferralCode(String referralCode){
-        Optional<Referral> reff = referralRepo.findByReferralCode(referralCode);
-        if(reff.isPresent()){
-            return reff;
-        }else {
-            return null;
-        }
+        return referralRepo.findByReferralCode(referralCode);
     }
 
 }

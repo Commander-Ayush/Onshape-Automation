@@ -74,7 +74,7 @@ async function initiateRazorpay(assignment, referral) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             automationName: assignment.name,
-            price: assignment.price   // plain number string, no ₹
+            price: assignment.price
         })
     });
 
@@ -87,8 +87,30 @@ async function initiateRazorpay(assignment, referral) {
         name: "Graphics Auto",
         description: "Order for " + order.automationName,
         order_id: order.razorpayOrderId,
-        handler: function (response) {
-            alert("Payment successful! ID: " + response.razorpay_payment_id);
+        handler: async function (response) {
+            try {
+                const verifyResponse = await fetch("/api/payment/verify", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        razorpayPaymentId: response.razorpay_payment_id,
+                        razorpayOrderId:   response.razorpay_order_id,
+                        razorpaySignature: response.razorpay_signature
+                    })
+                });
+
+                const result = await verifyResponse.json();
+
+                if (result.status === "verified") {
+                    alert("✅ Payment verified! ID: " + response.razorpay_payment_id);
+                    // optional: window.location.href = "/success";
+                } else {
+                    alert("❌ Payment verification failed. Please contact support.");
+                }
+            } catch (err) {
+                console.error("Verification error:", err);
+                alert("Something went wrong during verification.");
+            }
         }
     };
 
@@ -102,7 +124,7 @@ document.getElementById("apply").addEventListener("click", async function () {
     const referralCode = document.getElementById('referralInput').value.trim();
 
     const response = await fetch("/api/payment/referralCode", {
-        method: "GET",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ referralCode: referralCode })
     });
@@ -123,6 +145,7 @@ document.getElementById("apply").addEventListener("click", async function () {
     } catch (e) {
         document.getElementById('referralStatus').innerText = "Something went wrong on the server side";
         this.disabled = false;
+        console.log(e.message)
     }
 
 });

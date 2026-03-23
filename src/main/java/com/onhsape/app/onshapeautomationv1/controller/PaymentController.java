@@ -2,6 +2,7 @@ package com.onhsape.app.onshapeautomationv1.controller;
 
 import com.onhsape.app.onshapeautomationv1.entity.AssignmentOrder;
 import com.onhsape.app.onshapeautomationv1.entity.Referral;
+import com.onhsape.app.onshapeautomationv1.model.PaymentVerification;
 import com.onhsape.app.onshapeautomationv1.service.PayService;
 import com.onhsape.app.onshapeautomationv1.service.RazorPay;
 import com.onhsape.app.onshapeautomationv1.service.ReferralService;
@@ -55,6 +56,23 @@ public class PaymentController {
             return ResponseEntity.ok(Map.of("discount", discount));
         }
         else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<?> verifyPayment(@RequestBody PaymentVerification verification) {
+        try {
+            boolean isValid = payService.verifyPayment(verification);
+
+            if (isValid) {
+                return ResponseEntity.ok(Map.of("status", "verified"));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("status", "invalid_signature"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("status", "error", "message", e.getMessage()));
+        }
     }
 
 }

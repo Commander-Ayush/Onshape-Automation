@@ -2,10 +2,12 @@ package com.onhsape.app.onshapeautomationv1.service;
 
 import com.onhsape.app.onshapeautomationv1.entity.AssignmentOrder;
 
+import com.onhsape.app.onshapeautomationv1.model.PaymentVerification;
 import com.onhsape.app.onshapeautomationv1.repository.OrderRepository;
 import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
+import com.razorpay.Utils;
 import org.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -42,5 +44,18 @@ public class RazorPay implements PayService {
         }
 
         return orderRepository.save(assignmentOrder);
+    }
+
+    @Override
+    public boolean verifyPayment(PaymentVerification verification) throws RazorpayException {
+
+        // Razorpay expects the signature to be verified against:
+        // razorpay_order_id + "|" + razorpay_payment_id
+        JSONObject options = new JSONObject();
+        options.put("razorpay_order_id",   verification.getRazorpayOrderId());
+        options.put("razorpay_payment_id", verification.getRazorpayPaymentId());
+        options.put("razorpay_signature",  verification.getRazorpaySignature());
+
+        return Utils.verifyPaymentSignature(options, apiSecret);
     }
 }
