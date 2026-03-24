@@ -57,6 +57,7 @@ public class AdminController {
     @ResponseBody
     public ResponseEntity<String> assignmentUpload
             (@RequestParam("image") MultipartFile file,
+             @RequestParam("nameOfImage")  String imageName,
              @RequestParam("scriptFile")  MultipartFile scriptFile,
              @RequestParam("nameOfAssignment") String name,
              @RequestParam("dimensionOfAssignment") String dimension,
@@ -71,6 +72,7 @@ public class AdminController {
             assignment.setCollegeOfAssignment(collegeName);
             assignment.setBranchOfAssignment(branch);
             assignment.setPriceOfAssignment(price);
+            assignment.setImageName(imageName);
 
             //saving the file in Puppeteer Automations
 
@@ -85,9 +87,7 @@ public class AdminController {
             //Saving the Image on Cloudinary
             Map data = this.imageService.upload(file);
             String imageURL = (String) data.get("url");
-            String imageName = (String) data.get("name");
             assignment.setImageURL(imageURL);
-            assignment.setImageName(imageName);
 
             //Saving the assignment to the database.
             assignmentServiceImpl.saveAssignment(assignment);

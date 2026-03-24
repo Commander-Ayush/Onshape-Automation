@@ -17,15 +17,15 @@ public class SecurityConfiguration {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/login-form", "/", "/home", "/admin","admin/cloudinary/upload").permitAll()
+                        .requestMatchers("/login", "/login-form", "/").permitAll()
                         .requestMatchers("/static/**", "/*.css", "/*.js").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-//                        .requestMatchers("/home").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/home").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((req, res, ex2) -> res.sendRedirect("/login"))
-                        .accessDeniedHandler((req, res, ex2) -> res.sendRedirect("/login")) // wrong role → back to login
+                        .accessDeniedHandler((req, res, ex2) -> res.sendRedirect("/login"))
                 );
 
         return http.build();

@@ -33,7 +33,8 @@ function openModal(button) {
     const priceRaw = card.querySelector('.price-value span').innerText.trim(); // just the number
 
     currentAssignment = {
-        name:    card.querySelector('.assignment-name').textContent.trim(),
+        name: card.querySelector('.assignment-name').innerText.trim(),
+        scriptFileName:    card.querySelector('#script-file-name').textContent.trim(),
         college: card.querySelector('.college-badge').textContent.trim(),
         price:   priceRaw,
         image:   card.querySelector('.img-placeholder img').src,
@@ -46,6 +47,10 @@ function openModal(button) {
 
     document.getElementById('referralInput').value        = '';
     document.getElementById('referralStatus').textContent = '';
+    document.getElementById('referralInput').disabled = false;
+    document.getElementById('referralStatus').textContent = '';
+    document.getElementById('apply').disabled = false;
+    document.getElementById('apply').innerText = 'Apply';
 
     document.getElementById('purchaseModal').classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -73,8 +78,10 @@ async function initiateRazorpay(assignment, referral) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            automationName: assignment.name,
-            price: assignment.price
+            assignmentName: assignment.name,
+            scriptFileName: assignment.scriptFileName,
+            price: assignment.price,
+            referralCode: referral
         })
     });
 
@@ -136,7 +143,10 @@ document.getElementById("apply").addEventListener("click", async function () {
 
             currentAssignment.price = currentAssignment.price - discount;
             document.getElementById('modalPrice').textContent = '₹' + currentAssignment.price;
-            document.getElementById('referralStatus').innerText = '✓ Code applied! ₹' + discount + ' off';
+            document.getElementById('apply').innerText = '✓ Code applied! ₹' + discount + ' off';
+            document.getElementById('referralInput').disabled = true;
+            document.getElementById('referralInput').value='';
+            this.disabled=true;
 
         } else {
             document.getElementById('referralStatus').innerText = "This referral code doesn't exist";

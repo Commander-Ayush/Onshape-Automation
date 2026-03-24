@@ -28,7 +28,7 @@ public class Assignment {
 
     private Integer priceOfAssignment;
 
-    private String automationName;
+    // I have removed automationName;
 
     private String imageURL;
 

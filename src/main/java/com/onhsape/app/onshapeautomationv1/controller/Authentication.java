@@ -3,6 +3,7 @@ package com.onhsape.app.onshapeautomationv1.controller;
 import com.onhsape.app.onshapeautomationv1.entity.GraphicsUser;
 import com.onhsape.app.onshapeautomationv1.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,7 @@ public class Authentication {
     @PostMapping("/login-form")
     @ResponseBody
     public ResponseEntity<String> authenticate(@RequestBody GraphicsUser graphicsUser,
-                                               HttpServletRequest request) {
+                                               HttpServletRequest request, HttpSession session) {
 
         String email = graphicsUser.getEmailAccount();
         String password = graphicsUser.getPassword();
@@ -73,10 +74,14 @@ public class Authentication {
                     SecurityContextHolder.getContext()
             );
 
+            session.setAttribute("user", user);
+
             // Redirect based on role
             String redirectUrl = user.getRole() == GraphicsUser.Role.ADMIN ? "/admin" : "/home";
             return ResponseEntity.ok(redirectUrl);
         }
+
+        //For real/actual users authentication starts from here
 
         if (!isValidUser(email, password)) {
             return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
@@ -107,6 +112,8 @@ public class Authentication {
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 SecurityContextHolder.getContext()
         );
+
+        session.setAttribute("user", user);
 
         // Redirect based on role
         String redirectUrl = user.getRole() == GraphicsUser.Role.ADMIN ? "/admin" : "/home";

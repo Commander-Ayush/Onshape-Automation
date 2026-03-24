@@ -35,12 +35,13 @@ public class RazorPay implements PayService {
         JSONObject orderObject = new JSONObject();
         orderObject.put("amount", assignmentOrder.getPrice()*100);
         orderObject.put("currency", "INR");
-        orderObject.put("receipt", assignmentOrder.getAutomationName());
+        orderObject.put("receipt", assignmentOrder.getAssignmentName());
 
         Order razorPayOrder = razorpayClient.orders.create(orderObject);
 
         if(razorPayOrder != null){
             assignmentOrder.setStatus(razorPayOrder.get("status"));
+            assignmentOrder.setRazorpayOrderId(razorPayOrder.get("id"));
         }
 
         return orderRepository.save(assignmentOrder);

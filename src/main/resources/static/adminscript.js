@@ -9,13 +9,12 @@ async function uploadAssignment() {
     const college = document.getElementById('college').value.trim();
     const branch = document.getElementById('branch').value.trim();
     const price = document.getElementById('price').value.trim();
-    const automationName = document.getElementById('automationName').value.trim();
     const imageFile = document.getElementById('image').files[0];
     const scriptFile = document.getElementById('script-name').files[0]; // ← note the fix here too
 
     console.log("Data loaded into variables...");
 
-    if (!name || !dimension || !college || !branch || !price || !automationName || !imageFile || !scriptFile) {
+    if (!name || !dimension || !college || !branch || !price || !imageFile || !scriptFile) {
         showMessage(msgEl, 'Please fill in all fields before submitting.', 'error');
         return;
     }
@@ -29,6 +28,7 @@ async function uploadAssignment() {
 
     const formData = new FormData();
     formData.append('image', imageFile);
+    formData.append('nameOfImage', imageFile.name);
     formData.append('scriptFile', scriptFile);
     formData.append('nameOfAssignment', name);
     formData.append('dimensionOfAssignment', dimension);

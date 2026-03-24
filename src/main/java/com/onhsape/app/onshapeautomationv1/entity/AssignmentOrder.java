@@ -7,7 +7,9 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@Component
 @Entity
 @Data
 @AllArgsConstructor
@@ -17,9 +19,12 @@ public class AssignmentOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String automationName;
+    private String assignmentName;
+    private String scriptFileName;
     private Integer price;
     private String status;
     private String referralCode;
-
+    private String razorpayOrderId;
+    private String userReferral;
+    private String userEmail;
 }
