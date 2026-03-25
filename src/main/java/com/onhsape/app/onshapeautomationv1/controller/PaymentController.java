@@ -4,18 +4,13 @@ import com.onhsape.app.onshapeautomationv1.entity.AssignmentOrder;
 import com.onhsape.app.onshapeautomationv1.entity.GraphicsUser;
 import com.onhsape.app.onshapeautomationv1.entity.Referral;
 import com.onhsape.app.onshapeautomationv1.model.PaymentVerification;
-import com.onhsape.app.onshapeautomationv1.service.PayService;
-import com.onhsape.app.onshapeautomationv1.service.RazorPay;
-import com.onhsape.app.onshapeautomationv1.service.ReferralService;
-import com.onhsape.app.onshapeautomationv1.service.ReferralServiceImpl;
+import com.onhsape.app.onshapeautomationv1.service.*;
 import com.razorpay.RazorpayException;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 import java.util.Optional;
@@ -28,10 +23,13 @@ public class PaymentController {
 
     private ReferralService referralService;
 
+    private UserReferralCode userReferralCode;
 
-    public PaymentController(PayService payService, ReferralService referralService) {
+
+    public PaymentController(PayService payService, ReferralService referralService, UserReferralCode userReferralCode) {
         this.payService = payService;
         this.referralService = referralService;
+        this.userReferralCode = userReferralCode;
     }
 
 //    @PostMapping("/create-order")
@@ -64,16 +62,17 @@ public class PaymentController {
 
         order.setUserEmail(user.getEmailAccount());
 
-        // referral comes from frontend
-        String referralCode = order.getReferralCode();
+        // Gives a unique referral code to every customer
+        Referral rCode;
+        rCode = userReferralCode.createReferralCode(user.getEmailAccount(), order.getPrice());
+        order.setUserReferral(rCode.getReferralCode());
 
-//        if (referralCode != null) {
-//            Optional<Referral> ref = referralService.checkReferralCode(referralCode);
-//            ref.ifPresent(r -> {
-//                int discount = r.getDiscount();
-//                order.setPrice(order.getPrice() - discount);
-//            });
-//        }
+        //Saving the referral code to the DB
+        referralService.saveReferral(rCode);
+
+        // referral comes from frontend
+        String referralCodeEnteredByUser = order.getReferralCode();
+        order.setReferralCode(referralCodeEnteredByUser);
 
         AssignmentOrder savedOrder = payService.createOrder(order);
 
@@ -83,8 +82,8 @@ public class PaymentController {
     @PostMapping("/referralCode")
     public ResponseEntity<Map<String, Integer>> checkReferralCode(@RequestBody Map<String, String> body) {
 
-        String referralCode = body.get("referralCode");
-        Optional<Referral> referCode = referralService.checkReferralCode(referralCode);
+        String enteredReferralCode = body.get("referralCode");
+        Optional<Referral> referCode = referralService.checkReferralCode(enteredReferralCode);
 
         if (referCode.isPresent()) {
             Integer discount = referCode.get().getDiscount();
@@ -103,6 +102,7 @@ public class PaymentController {
 
             if (isValid) {
                 return ResponseEntity.ok(Map.of("status", "verified"));
+
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("status", "invalid_signature"));
