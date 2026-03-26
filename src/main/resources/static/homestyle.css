@@ -7,12 +7,12 @@
 }
 
 :root {
-    --text: #343438;
-    --text-secondary: #3a3f3e;
+    --text: #28282B;
+    --text-secondary: #14192b;
     --green: #2db520;
     --green-dark: #1e8a16;
     --green-soft: rgba(45, 181, 32, 0.10);
-    --muted: #6b716e;
+    --muted: #28282B;
     --page-bg: #f0eeea;
     --card-bg: #faf9f6;
     --white: #ffffff;
@@ -324,10 +324,10 @@ select:focus {
 }
 
 .detail-label {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    /*text-transform: uppercase;*/
+    letter-spacing: 0.05em;
     color: var(--muted);
     flex-shrink: 0;
 }

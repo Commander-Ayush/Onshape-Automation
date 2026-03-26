@@ -44,7 +44,7 @@ public class RazorPay implements PayService {
             assignmentOrder.setRazorpayOrderId(razorPayOrder.get("id"));
         }
 
-        return orderRepository.save(assignmentOrder);
+        return assignmentOrder;
     }
 
     @Override
@@ -58,5 +58,11 @@ public class RazorPay implements PayService {
         options.put("razorpay_signature",  verification.getRazorpaySignature());
 
         return Utils.verifyPaymentSignature(options, apiSecret);
+    }
+
+    @Override
+    public AssignmentOrder saveOrder(AssignmentOrder order) {
+        order.setStatus("pending");
+        return orderRepository.save(order);
     }
 }

@@ -32,50 +32,9 @@ public class PaymentController {
         this.userReferralCode = userReferralCode;
     }
 
-//    @PostMapping("/create-order")
-//    public ResponseEntity<?> createOrder(@RequestBody AssignmentOrder order)
-//            throws RazorpayException {
-//        try{
-//            AssignmentOrder savedOrder = payService.createOrder(order);
-//            String code = user.getEmailAccount().endsWith("@gmail.com") ?
-//                    user.getEmailAccount().substring(0, user.getEmailAccount().length()-"@gmail.com".length())
-//                    : "";
-//            if(order.getPrice()<=45){
-//                code.concat("15");
-//            } else if (order.getPrice()>=60 && order.getPrice()<=100) {
-//                code.concat("20");
-//            } else if (order.getPrice()>=300) {
-//                code.concat("55");
-//            }
-//            order.setUserReferral(code);
-//            order.setUserName(user.getEmailAccount());
-//            return ResponseEntity.ok(savedOrder);
-//        }catch (Exception e){
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
     @PostMapping("/create-order")
-    public ResponseEntity<?> createOrder(@RequestBody AssignmentOrder order,
-                                         HttpSession session) throws RazorpayException {
-
-        GraphicsUser user = (GraphicsUser) session.getAttribute("user");
-
-        order.setUserEmail(user.getEmailAccount());
-
-        // Gives a unique referral code to every customer
-        Referral rCode;
-        rCode = userReferralCode.createReferralCode(user.getEmailAccount(), order.getPrice());
-        order.setUserReferral(rCode.getReferralCode());
-
-        //Saving the referral code to the DB
-        referralService.saveReferral(rCode);
-
-        // referral comes from frontend
-        String referralCodeEnteredByUser = order.getReferralCode();
-        order.setReferralCode(referralCodeEnteredByUser);
-
+    public ResponseEntity<?> createOrder(@RequestBody AssignmentOrder order) throws RazorpayException {
         AssignmentOrder savedOrder = payService.createOrder(order);
-
         return ResponseEntity.ok(savedOrder);
     }
 
@@ -103,6 +62,7 @@ public class PaymentController {
             if (isValid) {
                 return ResponseEntity.ok(Map.of("status", "verified"));
 
+
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("status", "invalid_signature"));
@@ -111,6 +71,29 @@ public class PaymentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("status", "error", "message", e.getMessage()));
         }
+    }
+
+    @PostMapping("/save-order")
+    public ResponseEntity<?> saveOrder(@RequestBody AssignmentOrder order, HttpSession session) throws RazorpayException {
+
+        GraphicsUser user = (GraphicsUser) session.getAttribute("user");
+
+        order.setUserEmail(user.getEmailAccount());
+
+        // Gives a unique referral code to every customer
+        Referral rCode;
+        rCode = userReferralCode.createReferralCode(user.getEmailAccount(), order.getPrice());
+        order.setUserReferral(rCode.getReferralCode());
+
+        //Saving the referral code to the DB
+        referralService.saveReferral(rCode);
+
+        // referral comes from frontend
+        String referralCodeEnteredByUser = order.getReferralCode();
+        order.setReferralCode(referralCodeEnteredByUser); {
+
+        return ResponseEntity.ok(payService.saveOrder(order));
+    }
     }
 
 }

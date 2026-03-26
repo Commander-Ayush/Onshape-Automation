@@ -12,7 +12,6 @@ public class AssignmentServiceImpl implements AssignmentService{
     @Autowired
     private AssignmentRepo assignmentRepo;
 
-
     @Override
     public List<Assignment> getAllAssignments() {
         return assignmentRepo.findAll();

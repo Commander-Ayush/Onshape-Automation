@@ -17,8 +17,7 @@ public class NodeAutomationStarter implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
         ProcessBuilder builder = new ProcessBuilder(
-                "node",
-                "server.js"
+                "node"," server.js"
         );
 
         builder.directory(new File("Puppeteer Automation"));

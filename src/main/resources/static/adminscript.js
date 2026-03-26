@@ -58,3 +58,7 @@ async function uploadAssignment() {
         showError(btn, btnText, msgEl, 'Could not reach server. Is it running?');
     }
 }
+
+function redirectToHome(){
+    window.location.href = "/home";
+}

@@ -34,6 +34,9 @@ public class Authentication {
     @Value("${test.password}")
     private String testPassword;
 
+    private String email;
+    private String password;
+
     @GetMapping("/login")
     public String login(){
         return "login";
@@ -45,8 +48,8 @@ public class Authentication {
     public ResponseEntity<String> authenticate(@RequestBody GraphicsUser graphicsUser,
                                                HttpServletRequest request, HttpSession session) {
 
-        String email = graphicsUser.getEmailAccount();
-        String password = graphicsUser.getPassword();
+        email = graphicsUser.getEmailAccount();
+        password = graphicsUser.getPassword();
 
         if(email.equals(testEmail) && password.equals(testPassword)){
             GraphicsUser user = userRepository.findByEmailAccount(email)
@@ -140,6 +143,35 @@ public class Authentication {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    @PostMapping("/api/run/automation-script")
+    public ResponseEntity<?> runAutomation(@RequestParam("scriptName") String scriptName,
+                                           HttpSession session ) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+
+            Map<String, String> body = new HashMap<>();
+            body.put("email", email);
+            body.put("password", password);
+
+            ResponseEntity<Map> response = restTemplate.postForEntity(
+                    "http://localhost:3000/" + scriptName,
+                    body,
+                    Map.class
+            );
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return ResponseEntity.ok(response.getBody());
+            } else {
+                return ResponseEntity.status(response.getStatusCode())
+                        .body(Map.of("error", "Automation returned non-200"));
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(Map.of("error", "Node server unreachable: " + e.getMessage()));
         }
     }
 }

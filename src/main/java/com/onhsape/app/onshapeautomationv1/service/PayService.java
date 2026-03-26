@@ -9,4 +9,6 @@ public interface PayService {
     AssignmentOrder createOrder(AssignmentOrder orders) throws RazorpayException;
 
     boolean verifyPayment(PaymentVerification verification) throws RazorpayException;
+
+    AssignmentOrder saveOrder(AssignmentOrder order);
 }

@@ -1,35 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
-    filterCards();
-});
-
-function filterCards() {
-    const selected   = document.getElementById('collegeFilter').value;
-    const cards      = document.querySelectorAll('.assignmentCard');
-    const emptyState = document.getElementById('emptyState');
-
-    let visibleCount = 0;
-
-    cards.forEach(function (card) {
-        const college = card.getAttribute('data-college');
-        if (selected === 'ALL' || college === selected) {
-            card.classList.remove('hidden');
-            visibleCount++;
-        } else {
-            card.classList.add('hidden');
-        }
-    });
-
-    if (emptyState) {
-        emptyState.style.display = visibleCount === 0 ? 'flex' : 'none';
-    }
-}
-
-// ── Modal state ───────────────────────────────────────
-let currentAssignment = {};
-
-document.addEventListener('DOMContentLoaded', function () {
-    filterCards();
-});
+document.addEventListener('DOMContentLoaded', filterCards);
 
 function filterCards() {
     const selected   = document.getElementById('collegeFilter').value;
@@ -59,22 +28,19 @@ let currentAssignment = {};
 function openModal(button) {
     const card = button.closest('.assignmentCard');
 
-    const priceRaw = card.querySelector('.price-value span').innerText.trim();
-
     currentAssignment = {
         name:          card.querySelector('.assignment-name').innerText.trim(),
         scriptFileName: card.querySelector('#script-file-name').textContent.trim(),
         college:       card.querySelector('.college-badge').textContent.trim(),
-        price:         priceRaw,
+        price:         card.querySelector('.price-value span').innerText.trim(),
         image:         card.querySelector('.img-placeholder img').src,
         referralCode:  ''
     };
 
-    document.getElementById('modalName').textContent    = currentAssignment.name;
-    document.getElementById('modalCollege').textContent = currentAssignment.college;
-    document.getElementById('modalPrice').textContent   = '₹' + currentAssignment.price;
-    document.getElementById('modalImage').src           = currentAssignment.image;
-
+    document.getElementById('modalName').textContent     = currentAssignment.name;
+    document.getElementById('modalCollege').textContent  = currentAssignment.college;
+    document.getElementById('modalPrice').textContent    = '₹' + currentAssignment.price;
+    document.getElementById('modalImage').src            = currentAssignment.image;
     document.getElementById('referralInput').value       = '';
     document.getElementById('referralInput').disabled    = false;
     document.getElementById('referralStatus').textContent = '';
@@ -103,12 +69,13 @@ function handleBuyNow() {
 }
 
 async function initiateRazorpay(assignment, referral) {
+    const scriptName = assignment.scriptFileName.substring(0, assignment.scriptFileName.lastIndexOf("."));
     const response = await fetch("/api/payment/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             assignmentName: assignment.name,
-            scriptFileName: assignment.scriptFileName,
+            scriptFileName: scriptName,
             price:          assignment.price,
             referralCode:   referral
         })
@@ -139,7 +106,30 @@ async function initiateRazorpay(assignment, referral) {
 
                 if (result.status === "verified") {
                     alert("Payment verified! ID: " + response.razorpay_payment_id);
-                    await fetch("/api/payment/create-order", {})
+                    const backendResponse = await fetch("/api/payment/save-order",{
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            assignmentName: assignment.name,
+                            scriptFileName: scriptName,
+                            price:          assignment.price,
+                            referralCode:   referral,
+                            razorpayPaymentId: response.razorpay_payment_id,
+                            razorpayOrderId:   response.razorpay_order_id,
+                            razorpaySignature: response.razorpay_signature
+                        })
+
+                    })
+                    const execute = await fetch("/api/run/automation-script",{
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            scriptName: scriptName
+                        })
+
+                    })
+
+
                 } else {
                     alert("Payment verification failed. Please contact support.");
                 }
@@ -155,7 +145,6 @@ async function initiateRazorpay(assignment, referral) {
 }
 
 document.getElementById("apply").addEventListener("click", async function () {
-
     this.disabled = true;
 
     const referralCode = document.getElementById('referralInput').value.trim();
@@ -163,7 +152,7 @@ document.getElementById("apply").addEventListener("click", async function () {
     const response = await fetch("/api/payment/referralCode", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ referralCode: referralCode })
+        body: JSON.stringify({ referralCode })
     });
 
     try {
@@ -171,14 +160,12 @@ document.getElementById("apply").addEventListener("click", async function () {
             const data = await response.json();
             const discount = data.discount;
 
-            currentAssignment.price = currentAssignment.price - discount;
+            currentAssignment.price -= discount;
             currentAssignment.referralCode = referralCode;
             document.getElementById('modalPrice').textContent = '₹' + currentAssignment.price;
             document.getElementById('apply').innerText = '✓ Code applied! ₹' + discount + ' off';
             document.getElementById('referralInput').disabled = true;
             document.getElementById('referralInput').value = '';
-            this.disabled = true;
-
         } else {
             document.getElementById('referralStatus').innerText = "This referral code doesn't exist";
             this.disabled = false;
@@ -188,7 +175,6 @@ document.getElementById("apply").addEventListener("click", async function () {
         this.disabled = false;
         console.log(e.message);
     }
-
 });
 
 document.getElementById("referralInput").addEventListener("keypress", function () {
