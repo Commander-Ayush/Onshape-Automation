@@ -4,6 +4,7 @@ import com.onhsape.app.onshapeautomationv1.entity.Assignment;
 import com.onhsape.app.onshapeautomationv1.entity.Referral;
 import com.onhsape.app.onshapeautomationv1.repository.AssignmentRepo;
 import com.onhsape.app.onshapeautomationv1.repository.OrderRepository;
+import com.onhsape.app.onshapeautomationv1.service.AssignmentService;
 import com.onhsape.app.onshapeautomationv1.service.AssignmentServiceImpl;
 import com.onhsape.app.onshapeautomationv1.service.ImageService;
 
@@ -27,21 +28,18 @@ public class AdminController {
     @Value("${file.upload.location}")
     private String scriptUploadDirectory;
 
-    private final AssignmentRepo assignmentRepo;
+    private AssignmentService assignmentService;
 
     private final ReferralServiceImpl referralServiceImpl;
-
-    private final AssignmentServiceImpl assignmentServiceImpl;
 
     private OrderRepository orderRepository;
 
     private ImageService imageService;
 
-    public AdminController(AssignmentServiceImpl assignmentServiceImpl, OrderRepository orderRepository, ImageService imageService, AssignmentRepo assignmentRepo, ReferralServiceImpl referralServiceImpl) {
+    public AdminController(OrderRepository orderRepository, ImageService imageService, AssignmentService assignmentService, ReferralServiceImpl referralServiceImpl) {
         this.orderRepository = orderRepository;
         this.imageService = imageService;
-        this.assignmentServiceImpl = assignmentServiceImpl;
-        this.assignmentRepo = assignmentRepo;
+        this.assignmentService = assignmentService;
         this.referralServiceImpl = referralServiceImpl;
     }
 
@@ -74,15 +72,34 @@ public class AdminController {
             assignment.setPriceOfAssignment(price);
             assignment.setImageName(imageName);
 
-            //saving the file in Puppeteer Automations
+            System.out.println("Flow point 1");
 
+            //saving the file in Puppeteer Automations
             File dir = new File(scriptUploadDirectory);
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-            String filePath = scriptUploadDirectory + scriptFile.getOriginalFilename();
-            scriptFile.transferTo(new File(filePath));
-            assignment.setScriptFileName(scriptFile.getOriginalFilename());
+
+            System.out.println("Flow point 2");
+
+            String fileName = scriptFile.getOriginalFilename();
+            File targetFile = new File(scriptUploadDirectory + fileName);
+
+            // If file exists → delete it
+            if (targetFile.exists()) {
+                boolean deleted = targetFile.delete();
+
+                if (!deleted) {
+                    return new ResponseEntity<>("Failed to replace existing file", HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            }
+
+            System.out.println("Flow point 3");
+            // Save new file
+            scriptFile.transferTo(targetFile);
+            assignment.setScriptFileName(fileName);
+
+            System.out.println("Flow point 4");
 
             //Saving the Image on Cloudinary
             Map data = this.imageService.upload(file);
@@ -90,7 +107,7 @@ public class AdminController {
             assignment.setImageURL(imageURL);
 
             //Saving the assignment to the database.
-            assignmentServiceImpl.saveAssignment(assignment);
+            assignmentService.saveAssignment(assignment);
 
             return new ResponseEntity<>("success", HttpStatus.CREATED);
         }catch(Exception e){

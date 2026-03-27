@@ -18,6 +18,8 @@ public class Assignment {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
+    private String scriptFileName;
+
     private String nameOfAssignment;
 
     private String dimensionOfAssignment;
@@ -34,7 +36,7 @@ public class Assignment {
 
     private String imageName;
 
-    private String scriptFileName;
+
 
 
 }

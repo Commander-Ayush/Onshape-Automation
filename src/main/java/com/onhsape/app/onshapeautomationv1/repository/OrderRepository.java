@@ -4,8 +4,12 @@ import com.onhsape.app.onshapeautomationv1.entity.AssignmentOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
+
 public interface OrderRepository extends JpaRepository<AssignmentOrder,Integer> {
 
     @Query("SELECT COALESCE(SUM(a.price),0) FROM AssignmentOrder a")
     Integer getTotalEarnings();
+
+    Optional<AssignmentOrder> findByRazorpayOrderId(String razorpayOrderId);
 }

@@ -1,5 +1,7 @@
 package com.onhsape.app.onshapeautomationv1.controller;
 
+import com.onhsape.app.onshapeautomationv1.entity.Assignment;
+import com.onhsape.app.onshapeautomationv1.entity.AssignmentOrder;
 import com.onhsape.app.onshapeautomationv1.entity.GraphicsUser;
 import com.onhsape.app.onshapeautomationv1.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,9 +36,6 @@ public class Authentication {
     @Value("${test.password}")
     private String testPassword;
 
-    private String email;
-    private String password;
-
     @GetMapping("/login")
     public String login(){
         return "login";
@@ -48,8 +47,8 @@ public class Authentication {
     public ResponseEntity<String> authenticate(@RequestBody GraphicsUser graphicsUser,
                                                HttpServletRequest request, HttpSession session) {
 
-        email = graphicsUser.getEmailAccount();
-        password = graphicsUser.getPassword();
+        String email = graphicsUser.getEmailAccount();
+        String password = graphicsUser.getPassword();
 
         if(email.equals(testEmail) && password.equals(testPassword)){
             GraphicsUser user = userRepository.findByEmailAccount(email)
@@ -146,15 +145,18 @@ public class Authentication {
         }
     }
 
-    @PostMapping("/api/run/automation-script")
-    public ResponseEntity<?> runAutomation(@RequestParam("scriptName") String scriptName,
-                                           HttpSession session ) {
+    @PostMapping("/api/authenticated/automation-script")
+    public ResponseEntity<?> runAutomation(@RequestBody Assignment assignment, HttpSession session) {
         try {
-            RestTemplate restTemplate = new RestTemplate();
+            GraphicsUser user = (GraphicsUser) session.getAttribute("user");
 
             Map<String, String> body = new HashMap<>();
-            body.put("email", email);
-            body.put("password", password);
+            body.put("email", user.getEmailAccount());
+            body.put("password", user.getPassword());
+
+            String scriptName = assignment.getScriptFileName();
+
+            RestTemplate restTemplate = new RestTemplate();
 
             ResponseEntity<Map> response = restTemplate.postForEntity(
                     "http://localhost:3000/" + scriptName,
@@ -163,10 +165,12 @@ public class Authentication {
             );
 
             if (response.getStatusCode().is2xxSuccessful()) {
-                return ResponseEntity.ok(response.getBody());
+                System.out.println("Automation Ran successfully");
+                return ResponseEntity.ok(Map.of("status", "ok"));
             } else {
                 return ResponseEntity.status(response.getStatusCode())
                         .body(Map.of("error", "Automation returned non-200"));
+
             }
 
         } catch (Exception e) {

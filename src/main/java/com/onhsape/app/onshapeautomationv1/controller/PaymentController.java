@@ -4,6 +4,7 @@ import com.onhsape.app.onshapeautomationv1.entity.AssignmentOrder;
 import com.onhsape.app.onshapeautomationv1.entity.GraphicsUser;
 import com.onhsape.app.onshapeautomationv1.entity.Referral;
 import com.onhsape.app.onshapeautomationv1.model.PaymentVerification;
+import com.onhsape.app.onshapeautomationv1.repository.OrderRepository;
 import com.onhsape.app.onshapeautomationv1.service.*;
 import com.razorpay.RazorpayException;
 import jakarta.servlet.http.HttpSession;
@@ -25,10 +26,13 @@ public class PaymentController {
 
     private UserReferralCode userReferralCode;
 
+    private OrderRepository  orderRepository;
 
-    public PaymentController(PayService payService, ReferralService referralService, UserReferralCode userReferralCode) {
+
+    public PaymentController(PayService payService, ReferralService referralService, UserReferralCode userReferralCode, OrderRepository orderRepository) {
         this.payService = payService;
         this.referralService = referralService;
+        this.orderRepository = orderRepository;
         this.userReferralCode = userReferralCode;
     }
 
@@ -94,6 +98,27 @@ public class PaymentController {
 
         return ResponseEntity.ok(payService.saveOrder(order));
     }
+    }
+
+    @PostMapping("/save-order-status")
+    public ResponseEntity<?> savedOrderConfirmation(@RequestBody Map<String, String> body) {
+
+        System.out.println("Process to change the order status initiated");
+        String razorpayOrderId = body.get("razorpayOrderId");
+        String status = body.get("status");
+
+        AssignmentOrder order = orderRepository.findByRazorpayOrderId(razorpayOrderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        order.setStatus(status);
+        System.out.println(order.getUserEmail());
+        System.out.println(order.getReferralCode());
+        orderRepository.save(order);
+
+
+        System.out.println("Change Done order created");
+
+        return ResponseEntity.ok().build();
     }
 
 }

@@ -69,15 +69,21 @@ function handleBuyNow() {
 }
 
 async function initiateRazorpay(assignment, referral) {
-    const scriptName = assignment.scriptFileName.substring(0, assignment.scriptFileName.lastIndexOf("."));
+
+    const scriptName = assignment.scriptFileName.substring(
+        0,
+        assignment.scriptFileName.lastIndexOf(".")
+    );
+
+    // STEP 1: Create order
     const response = await fetch("/api/payment/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             assignmentName: assignment.name,
             scriptFileName: scriptName,
-            price:          assignment.price,
-            referralCode:   referral
+            price: assignment.price,
+            referralCode: referral
         })
     });
 
@@ -90,49 +96,76 @@ async function initiateRazorpay(assignment, referral) {
         name: "Graphics Auto",
         description: "Order for " + order.automationName,
         order_id: order.razorpayOrderId,
+
         handler: async function (response) {
+
+            const razorpayPaymentId = response.razorpay_payment_id;
+            const razorpayOrderId   = response.razorpay_order_id;
+            const razorpaySignature = response.razorpay_signature;
+
             try {
                 const verifyResponse = await fetch("/api/payment/verify", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        razorpayPaymentId: response.razorpay_payment_id,
-                        razorpayOrderId:   response.razorpay_order_id,
-                        razorpaySignature: response.razorpay_signature
+                        razorpayPaymentId,
+                        razorpayOrderId,
+                        razorpaySignature
                     })
                 });
 
                 const result = await verifyResponse.json();
 
                 if (result.status === "verified") {
-                    alert("Payment verified! ID: " + response.razorpay_payment_id);
-                    const backendResponse = await fetch("/api/payment/save-order",{
+
+                    alert("Payment verified! ID: " + razorpayPaymentId);
+
+                    // STEP 3: Save order
+                    const backendResponse = await fetch("/api/payment/save-order", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                             assignmentName: assignment.name,
                             scriptFileName: scriptName,
-                            price:          assignment.price,
-                            referralCode:   referral,
-                            razorpayPaymentId: response.razorpay_payment_id,
-                            razorpayOrderId:   response.razorpay_order_id,
-                            razorpaySignature: response.razorpay_signature
+                            price: assignment.price,
+                            referralCode: referral,
+                            razorpayPaymentId,
+                            razorpayOrderId,
+                            razorpaySignature
                         })
+                    });
 
-                    })
-                    const execute = await fetch("/api/run/automation-script",{
+                    await backendResponse.json(); // optional but clean
+
+                    // STEP 4: Run automation
+                    const execute = await fetch("/api/authenticated/automation-script", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
-                            scriptName: scriptName
+                            scriptFileName: scriptName
                         })
+                    });
 
-                    })
+                    const executionResponse = await execute.json();
 
+                    // STEP 5: Update order status
+                    if (executionResponse.status === "ok") {
+                        console.log("Automation Ran successfully message received in the frontend");
+
+                        await fetch("/api/payment/save-order-status", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                razorpayOrderId,
+                                status: "created"
+                            })
+                        });
+                    }
 
                 } else {
                     alert("Payment verification failed. Please contact support.");
                 }
+
             } catch (err) {
                 console.error("Verification error:", err);
                 alert("Something went wrong during verification.");
