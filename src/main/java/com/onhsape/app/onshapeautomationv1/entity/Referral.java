@@ -21,4 +21,6 @@ public class Referral{
 
     private Integer discount;
 
+    private String upiId;
+
 }
