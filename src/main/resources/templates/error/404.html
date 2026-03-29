@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>404 Not Found</title>
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 80px;
+            margin: 0;
+            animation: bounce 1s infinite alternate;
+        }
+
+        p {
+            font-size: 18px;
+            opacity: 0.8;
+        }
+
+        img {
+            width: 250px;
+            margin-top: 20px;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-20px); }
+        }
+
+        img{
+            aspect-ratio: 1 / 1;
+            height: 30px;
+        }
+
+        a {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #38bdf8;
+            color: black;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>404</h1>
+<p>Oops! Page not found</p>
+
+<img src="/img/404.png" alt="404 image">
+
+<a href="/home">Go Back Home</a>
+
+</body>
+</html>

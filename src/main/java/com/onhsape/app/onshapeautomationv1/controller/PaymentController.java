@@ -20,20 +20,20 @@ import java.util.Optional;
 @RequestMapping("/api/payment")
 public class PaymentController {
 
-    private PayService payService;
+    private final MailService mailService;
+    private final PayService payService;
+    private final ReferralService referralService;
+    private final UserReferralCode userReferralCode;
+    private final OrderRepository  orderRepository;
+    private final AutomationExecutioner automationExecutioner;
 
-    private ReferralService referralService;
-
-    private UserReferralCode userReferralCode;
-
-    private OrderRepository  orderRepository;
-
-
-    public PaymentController(PayService payService, ReferralService referralService, UserReferralCode userReferralCode, OrderRepository orderRepository) {
+    public PaymentController(AutomationExecutioner automationExecutioner, PayService payService, ReferralService referralService, UserReferralCode userReferralCode, OrderRepository orderRepository, MailService mailService) {
         this.payService = payService;
         this.referralService = referralService;
         this.orderRepository = orderRepository;
         this.userReferralCode = userReferralCode;
+        this.mailService = mailService;
+        this.automationExecutioner=automationExecutioner;
     }
 
     @PostMapping("/create-order")
@@ -78,26 +78,32 @@ public class PaymentController {
     }
 
     @PostMapping("/save-order")
-    public ResponseEntity<?> saveOrder(@RequestBody AssignmentOrder order, HttpSession session) throws RazorpayException {
+    public ResponseEntity<?> saveOrder(@RequestBody AssignmentOrder order, HttpSession session) {
 
         GraphicsUser user = (GraphicsUser) session.getAttribute("user");
 
         order.setUserEmail(user.getEmailAccount());
 
-        // Gives a unique referral code to every customer
-        Referral rCode;
-        rCode = userReferralCode.createReferralCode(user.getEmailAccount(), order.getPrice());
+        Referral rCode = userReferralCode.createReferralCode(user.getEmailAccount(), order.getPrice());
         order.setUserReferral(rCode.getReferralCode());
-
-        //Saving the referral code to the DB
         referralService.saveReferral(rCode);
 
-        // referral comes from frontend
-        String referralCodeEnteredByUser = order.getReferralCode();
-        order.setReferralCode(referralCodeEnteredByUser); {
+        AssignmentOrder savedOrder = payService.saveOrder(order);
 
-        return ResponseEntity.ok(payService.saveOrder(order));
-    }
+        ResponseEntity<String> automationResponse = automationExecutioner.createAutomation(
+                order.getScriptFileName(),
+                user.getEmailAccount(),
+                user.getPassword()
+        );
+
+        if (automationResponse.getStatusCode().is2xxSuccessful()) {
+            savedOrder.setStatus("completed");
+            orderRepository.save(savedOrder);
+            return ResponseEntity.ok(savedOrder);
+        }
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("status", "error", "message", "Automation failed"));
     }
 
     @PostMapping("/save-order-status")
@@ -114,6 +120,8 @@ public class PaymentController {
         System.out.println(order.getUserEmail());
         System.out.println(order.getReferralCode());
         orderRepository.save(order);
+
+        mailService.sendConfirmationMail(order.getUserEmail(), order.getUserReferral());
 
 
         System.out.println("Change Done order created");

@@ -2,10 +2,9 @@ package com.onhsape.app.onshapeautomationv1.controller;
 
 import com.onhsape.app.onshapeautomationv1.entity.Assignment;
 import com.onhsape.app.onshapeautomationv1.entity.Referral;
-import com.onhsape.app.onshapeautomationv1.repository.AssignmentRepo;
+import com.onhsape.app.onshapeautomationv1.repository.AppErrorRepository;
 import com.onhsape.app.onshapeautomationv1.repository.OrderRepository;
 import com.onhsape.app.onshapeautomationv1.service.AssignmentService;
-import com.onhsape.app.onshapeautomationv1.service.AssignmentServiceImpl;
 import com.onhsape.app.onshapeautomationv1.service.ImageService;
 
 import com.onhsape.app.onshapeautomationv1.service.ReferralServiceImpl;
@@ -19,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.Map;
-
 
 // AdminController.java
 @Controller
@@ -36,11 +34,18 @@ public class AdminController {
 
     private ImageService imageService;
 
-    public AdminController(OrderRepository orderRepository, ImageService imageService, AssignmentService assignmentService, ReferralServiceImpl referralServiceImpl) {
+    private AppErrorRepository appErrorRepository;
+
+    public AdminController(OrderRepository orderRepository,
+                           AppErrorRepository appErrorRepository,
+                           ImageService imageService,
+                           AssignmentService assignmentService,
+                           ReferralServiceImpl referralServiceImpl) {
         this.orderRepository = orderRepository;
         this.imageService = imageService;
         this.assignmentService = assignmentService;
         this.referralServiceImpl = referralServiceImpl;
+        this.appErrorRepository=appErrorRepository;
     }
 
     @GetMapping("/admin")
@@ -123,5 +128,18 @@ public class AdminController {
         }catch (Exception e){
             return new ResponseEntity<>("error", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/admin/errors")
+    @ResponseBody
+    public ResponseEntity<?> getErrors() {
+        return ResponseEntity.ok(appErrorRepository.findAllByOrderByTimestampDesc());
+    }
+
+    @DeleteMapping("/admin/errors/clear")
+    @ResponseBody
+    public ResponseEntity<?> clearErrors() {
+        appErrorRepository.deleteAll();
+        return ResponseEntity.ok().build();
     }
 }

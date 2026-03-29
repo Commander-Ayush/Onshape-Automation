@@ -59,6 +59,63 @@ async function uploadAssignment() {
     }
 }
 
+async function loadErrors() {
+    try {
+        const response = await fetch('/admin/errors');
+        const errors = await response.json();
+
+        const container = document.getElementById('errorList');
+        const emptyState = document.getElementById('errorListEmpty');
+        const countBadge = document.getElementById('errorCount');
+
+        countBadge.textContent = errors.length + ' error' + (errors.length === 1 ? '' : 's');
+
+        if (errors.length === 0) {
+            emptyState.style.display = 'flex';
+            countBadge.classList.remove('has-errors');
+            return;
+        }
+
+        emptyState.style.display = 'none';
+        countBadge.classList.add('has-errors');
+
+        // clear previous items before re-rendering
+        container.querySelectorAll('.error-item').forEach(el => el.remove());
+
+        errors.forEach(err => {
+            const item = document.createElement('div');
+            item.className = 'error-item';
+            item.innerHTML = `
+                <div class="error-item-header">
+                    <span class="error-endpoint">${err.endpoint ?? '—'}</span>
+                    <span class="error-timestamp">${new Date(err.timestamp).toLocaleString()}</span>
+                </div>
+                <span class="error-message">${err.errorMessage ?? 'Unknown error'}</span>
+            `;
+            container.appendChild(item);
+        });
+
+    } catch (e) {
+        console.error('Failed to load errors:', e);
+    }
+}
+
+async function clearErrors() {
+    try {
+        await fetch('/admin/errors/clear', { method: 'DELETE' });
+        document.querySelectorAll('.error-item').forEach(el => el.remove());
+        document.getElementById('errorListEmpty').style.display = 'flex';
+        document.getElementById('errorCount').textContent = '0 errors';
+        document.getElementById('errorCount').classList.remove('has-errors');
+    } catch (e) {
+        console.error('Failed to clear errors:', e);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadErrors();
+});
+
 function redirectToHome(){
     window.location.href = "/home";
 }

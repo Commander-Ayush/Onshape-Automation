@@ -121,7 +121,7 @@ async function initiateRazorpay(assignment, referral) {
                     alert("Payment verified! ID: " + razorpayPaymentId);
 
                     // STEP 3: Save order
-                    const backendResponse = await fetch("/api/payment/save-order", {
+                    const saveNExeResponse = await fetch("/api/payment/save-order", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
@@ -135,18 +135,7 @@ async function initiateRazorpay(assignment, referral) {
                         })
                     });
 
-                    await backendResponse.json(); // optional but clean
-
-                    // STEP 4: Run automation
-                    const execute = await fetch("/api/authenticated/automation-script", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            scriptFileName: scriptName
-                        })
-                    });
-
-                    const executionResponse = await execute.json();
+                    const executionResponse = await saveNExeResponse.json();
 
                     // STEP 5: Update order status
                     if (executionResponse.status === "ok") {
