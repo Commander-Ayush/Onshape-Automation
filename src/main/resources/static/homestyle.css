@@ -693,3 +693,122 @@ header.modal-open {
 #script-file-name {
     visibility: hidden;
 }
+
+/* AFTER PURCHASE MODAL */
+.receipt-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 12, 11, 0.72);
+
+    display: none;
+    /* hidden by default */
+    align-items: center;
+    justify-content: center;
+
+    z-index: 1000;
+    padding: 1rem;
+
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.receipt-modal-overlay.active {
+    display: flex;
+    /* visible when active */
+}
+
+.receipt-modal {
+    background: var(--white);
+    border-radius: 22px;
+
+    width: 100%;
+    max-width: 420px;
+    max-height: 92vh;
+    overflow-y: auto;
+
+    position: relative;
+
+    box-shadow: 0 32px 80px rgba(10, 12, 11, 0.35);
+
+    padding: 1.8rem 1.6rem;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+
+    text-align: center;
+
+    animation: modalSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-close {
+    position: absolute;
+    top: 13px;
+    right: 15px;
+
+    background: rgba(15, 17, 16, 0.09);
+    border: none;
+    border-radius: 50%;
+
+    width: 36px;
+    height: 36px;
+
+    font-size: 15px;
+    cursor: pointer;
+
+    color: var(--text-secondary);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:active {
+    transform: scale(0.9);
+}
+
+.receipt-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+    margin: 0;
+}
+
+.receipt-subtitle {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.receipt-confirmation {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.receipt-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-top: 6px;
+}
+
+.receipt-referral-code {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--green-dark);
+    margin: 4px 0;
+}

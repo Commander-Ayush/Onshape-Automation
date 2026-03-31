@@ -61,6 +61,41 @@
     <!-- ASSIGNMENT GRID -->
     <main class="assignment-container">
 
+        <!-- AFTER PURCHASE MODAL -->
+        <div class="receipt-modal-overlay" id="receiptModal" onclick="if(event.target === this) closeReceiptModal()">
+
+            <div class="receipt-modal">
+                <!-- Close Button -->
+                <button class="modal-close" onclick="closeReceiptModal()">✕</button>
+
+                <!-- Header -->
+                <h1 class="receipt-title">🎉 Congratulations</h1>
+
+                <!-- Messages -->
+                <p class="receipt-subtitle">Your order has been received</p>
+
+                <p class="receipt-confirmation">
+                    You will receive a confirmation mail on:
+                    <span id="confirmed-email">-</span>
+                </p>
+
+                <!-- Referral Section -->
+                <p class="receipt-label">This is your referral code</p>
+                <h2 class="receipt-referral-code" id="userReferral">-</h2>
+
+                <p class="receipt-label">
+                    Enter your UPI ID to receive money every time someone uses your referral code 😉
+                </p>
+
+                <!-- Input Section -->
+                <div class="receipt-upi-section">
+                    <input type="text" id="upiInput" class="upi-input" placeholder="@upi">
+                    <button id="upiSubmit" class="upi-submit-btn">Submit</button>
+                </div>
+
+            </div>
+        </div>
+
         <!-- ASSIGNMENT PURCHASE MODAL -->
         <div class="modal-overlay" id="purchaseModal" onclick="if(event.target===this) closeModal()">
             <div class="purchase-modal">
@@ -84,17 +119,20 @@
                     </div>
 
                     <div class="modal-referral-wrap">
-                        <label class="modal-label" for="referralInput">Referral Code <span class="optional">(optional)</span></label>
-                        <input type="text" id="referralInput" class="referral-input" placeholder="Enter code if you have one">
+                        <label class="modal-label" for="referralInput">Referral Code <span
+                                class="optional">(optional)</span></label>
+                        <input type="text" id="referralInput" class="referral-input"
+                            placeholder="Enter code if you have one">
                         <button type="button" id="apply">Apply</button>
                         <span class="referral-status" id="referralStatus"></span>
                     </div>
 
                     <button class="modal-buy-btn" id="modalBuyBtn" onclick="handleBuyNow()">
                         <svg viewBox="0 0 20 20" fill="none" width="16" height="16">
-                            <path d="M4 4h13l-1.5 8H5.5L4 4z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-                            <circle cx="8" cy="17" r="1.2" fill="currentColor"/>
-                            <circle cx="14" cy="17" r="1.2" fill="currentColor"/>
+                            <path d="M4 4h13l-1.5 8H5.5L4 4z" stroke="currentColor" stroke-width="1.4"
+                                stroke-linejoin="round" />
+                            <circle cx="8" cy="17" r="1.2" fill="currentColor" />
+                            <circle cx="14" cy="17" r="1.2" fill="currentColor" />
                         </svg>
                         Buy Now
                     </button>
