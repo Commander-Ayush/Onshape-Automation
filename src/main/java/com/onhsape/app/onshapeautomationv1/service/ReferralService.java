@@ -10,5 +10,7 @@ public interface ReferralService{
 
     Optional<Referral> checkReferralCode(String referralCode);
 
+    Optional<Referral> checkRazorpayorderId(String razorpayOrderId);
+
 
 }

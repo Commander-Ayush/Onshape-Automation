@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', filterCards);
 
 function filterCards() {
-    const selected   = document.getElementById('collegeFilter').value;
-    const cards      = document.querySelectorAll('.assignmentCard');
+    const selected = document.getElementById('collegeFilter').value;
+    const cards = document.querySelectorAll('.assignmentCard');
     const emptyState = document.getElementById('emptyState');
 
     let visibleCount = 0;
@@ -22,6 +22,49 @@ function filterCards() {
     }
 }
 
+function openReceiptModel(razorpayPaymentId, razorpayOrderId, usersReferralCode, commission, customersEmail) {
+
+    document.getElementById('razorpay-receipt').innerText = razorpayPaymentId;
+    document.getElementById('userReferral').innerText = usersReferralCode
+    document.getElementById('earn-money').innerText = commission;
+    document.getElementById('confirmed-email').innerText = customersEmail;
+    const usersUpiId = document.getElementById('upiInput').value.trim();
+
+    document.getElementById('upiSubmit').onclick = async function () {
+
+        document.getElementById('receiptModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+        document.querySelector('header').classList.add('modal-open');
+        this.disabled = true;
+
+        const response = await fetch("/api/payment/user-s-upi", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                upiId: usersUpiId,
+                razorpayOrderId: razorpayOrderId
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            document.getElementById('discount-message').innerText =
+                "You'll get ₹" + commission + " every time your referral code is used";
+        }
+    }
+}
+
+function closeReceiptModal() {
+    document.getElementById('receiptModal').classList.remove('active');
+    document.body.style.overflow = '';
+    document.querySelector('header').classList.remove('modal-open');
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeReceiptModal();
+});
+
 // ── Modal state ───────────────────────────────────────
 let currentAssignment = {};
 
@@ -29,23 +72,23 @@ function openModal(button) {
     const card = button.closest('.assignmentCard');
 
     currentAssignment = {
-        name:          card.querySelector('.assignment-name').innerText.trim(),
+        name: card.querySelector('.assignment-name').innerText.trim(),
         scriptFileName: card.querySelector('#script-file-name').textContent.trim(),
-        college:       card.querySelector('.college-badge').textContent.trim(),
-        price:         card.querySelector('.price-value span').innerText.trim(),
-        image:         card.querySelector('.img-placeholder img').src,
-        referralCode:  ''
+        college: card.querySelector('.college-badge').textContent.trim(),
+        price: card.querySelector('.price-value span').innerText.trim(),
+        image: card.querySelector('.img-placeholder img').src,
+        referralCode: ''
     };
 
-    document.getElementById('modalName').textContent     = currentAssignment.name;
-    document.getElementById('modalCollege').textContent  = currentAssignment.college;
-    document.getElementById('modalPrice').textContent    = '₹' + currentAssignment.price;
-    document.getElementById('modalImage').src            = currentAssignment.image;
-    document.getElementById('referralInput').value       = '';
-    document.getElementById('referralInput').disabled    = false;
+    document.getElementById('modalName').textContent = currentAssignment.name;
+    document.getElementById('modalCollege').textContent = currentAssignment.college;
+    document.getElementById('modalPrice').textContent = '₹' + currentAssignment.price;
+    document.getElementById('modalImage').src = currentAssignment.image;
+    document.getElementById('referralInput').value = '';
+    document.getElementById('referralInput').disabled = false;
     document.getElementById('referralStatus').textContent = '';
-    document.getElementById('apply').disabled            = false;
-    document.getElementById('apply').innerText           = 'Apply';
+    document.getElementById('apply').disabled = false;
+    document.getElementById('apply').innerText = 'Apply';
 
     document.getElementById('purchaseModal').classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -87,6 +130,8 @@ async function initiateRazorpay(assignment, referral) {
         })
     });
 
+    console.log("create-order-initiated");
+
     const order = await response.json();
 
     const options = {
@@ -100,7 +145,7 @@ async function initiateRazorpay(assignment, referral) {
         handler: async function (response) {
 
             const razorpayPaymentId = response.razorpay_payment_id;
-            const razorpayOrderId   = response.razorpay_order_id;
+            const razorpayOrderId = response.razorpay_order_id;
             const razorpaySignature = response.razorpay_signature;
 
             try {
@@ -117,9 +162,6 @@ async function initiateRazorpay(assignment, referral) {
                 const result = await verifyResponse.json();
 
                 if (result.status === "verified") {
-
-                    alert("Payment verified! ID: " + razorpayPaymentId);
-
                     // STEP 3: Save order
                     const saveNExeResponse = await fetch("/api/payment/save-order", {
                         method: "POST",
@@ -136,6 +178,15 @@ async function initiateRazorpay(assignment, referral) {
                     });
 
                     const executionResponse = await saveNExeResponse.json();
+
+                    // OPEN RECEIPT MODEL
+                    openReceiptModel(
+                        executionResponse.razorpayPaymentId,
+                        executionResponse.razorpayOrderId,
+                        executionResponse.userReferral,
+                        executionResponse.commissionMoney,
+                        executionResponse.userEmail
+                    );
 
                     // STEP 5: Update order status
                     if (executionResponse.status === "ok") {
@@ -203,3 +254,4 @@ document.getElementById("referralInput").addEventListener("keypress", function (
     document.getElementById('referralStatus').innerText = '';
     document.getElementById('apply').disabled = false;
 });
+

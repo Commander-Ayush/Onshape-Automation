@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
-@Component
 @Entity
 @Data
 @AllArgsConstructor
@@ -27,4 +26,6 @@ public class AssignmentOrder {
     private String razorpayOrderId;
     private String userReferral;
     private String userEmail;
+    private String razorpayPaymentId;
+    private Integer commissionMoney;
 }

@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface ReferralRepository extends JpaRepository<Referral,Long> {
 
     Optional<Referral> findByReferralCode(String referralCode);
+
+    Optional<Referral> findByRazorpayOrderId(String razorpayOrderId);
 }

@@ -23,4 +23,6 @@ public class Referral{
 
     private String upiId;
 
+    private String razorpayOrderId;
+
 }

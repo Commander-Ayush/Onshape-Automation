@@ -86,6 +86,8 @@ public class PaymentController {
 
         Referral rCode = userReferralCode.createReferralCode(user.getEmailAccount(), order.getPrice());
         order.setUserReferral(rCode.getReferralCode());
+        order.setCommissionMoney(rCode.getDiscount()-5);
+        rCode.setRazorpayOrderId(order.getRazorpayOrderId());
         referralService.saveReferral(rCode);
 
         AssignmentOrder savedOrder = payService.saveOrder(order);
@@ -127,6 +129,20 @@ public class PaymentController {
         System.out.println("Change Done order created");
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/user-s-upi")
+    public ResponseEntity<?> usersUpi(@RequestBody Referral referral) {
+        Optional<Referral> ref = referralService.checkRazorpayorderId(referral.getRazorpayOrderId());
+        if(ref.isPresent()) {
+            Referral customerUPI = ref.get();
+            customerUPI.setUpiId(referral.getUpiId());
+            referralService.saveReferral(customerUPI);
+
+            return ResponseEntity.ok(Map.of("commission", customerUPI.getDiscount()));
+        }
+        return ResponseEntity.notFound().build();
+
     }
 
 }

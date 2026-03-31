@@ -25,4 +25,10 @@ public class ReferralServiceImpl implements ReferralService{
         return referralRepo.findByReferralCode(referralCode);
     }
 
+    @Override
+    public Optional<Referral> checkRazorpayorderId(String razorpayOrderId) {
+        return referralRepo.findByRazorpayOrderId(razorpayOrderId);
+    }
+
+
 }
