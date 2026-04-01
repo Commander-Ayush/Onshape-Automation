@@ -22,21 +22,22 @@ function filterCards() {
     }
 }
 
-function openReceiptModel(razorpayPaymentId, razorpayOrderId, usersReferralCode, commission, customersEmail) {
+function openReceiptModel(razorpayOrderId, customersEmail) {
 
-    document.getElementById('razorpay-receipt').innerText = razorpayPaymentId;
-    document.getElementById('userReferral').innerText = usersReferralCode
-    document.getElementById('earn-money').innerText = commission;
+
+    document.getElementById('razorpayOrderID').innerText = razorpayOrderId;
     document.getElementById('confirmed-email').innerText = customersEmail;
+
+    // ← OPEN HERE, immediately
+    document.getElementById('receiptModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    document.querySelector('header').classList.add('modal-open');
+
     const usersUpiId = document.getElementById('upiInput').value.trim();
 
     document.getElementById('upiSubmit').onclick = async function () {
-
-        document.getElementById('receiptModal').classList.add('active');
-        document.body.style.overflow = 'hidden';
-        document.querySelector('header').classList.add('modal-open');
         this.disabled = true;
-
+        const usersUpiId = document.getElementById('upiInput').value.trim();
         const response = await fetch("/api/payment/user-s-upi", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -48,9 +49,8 @@ function openReceiptModel(razorpayPaymentId, razorpayOrderId, usersReferralCode,
 
         if (response.ok) {
             const data = await response.json();
-
-            document.getElementById('discount-message').innerText =
-                "You'll get ₹" + commission + " every time your referral code is used";
+            document.getElementById('earn-message').innerText =
+                "You'll get ₹20 every time your referral code is used";
         }
     }
 }
@@ -148,6 +148,11 @@ async function initiateRazorpay(assignment, referral) {
             const razorpayOrderId = response.razorpay_order_id;
             const razorpaySignature = response.razorpay_signature;
 
+            openReceiptModel(                                                   //OPEN RECEIPT MODEL
+                razorpayOrderId,
+                order.userEmail
+            );
+
             try {
                 const verifyResponse = await fetch("/api/payment/verify", {
                     method: "POST",
@@ -158,6 +163,8 @@ async function initiateRazorpay(assignment, referral) {
                         razorpaySignature
                     })
                 });
+
+                console.log("verification entities sent");
 
                 const result = await verifyResponse.json();
 
@@ -179,15 +186,6 @@ async function initiateRazorpay(assignment, referral) {
 
                     const executionResponse = await saveNExeResponse.json();
 
-                    // OPEN RECEIPT MODEL
-                    openReceiptModel(
-                        executionResponse.razorpayPaymentId,
-                        executionResponse.razorpayOrderId,
-                        executionResponse.userReferral,
-                        executionResponse.commissionMoney,
-                        executionResponse.userEmail
-                    );
-
                     // STEP 5: Update order status
                     if (executionResponse.status === "ok") {
                         console.log("Automation Ran successfully message received in the frontend");
@@ -207,8 +205,17 @@ async function initiateRazorpay(assignment, referral) {
                 }
 
             } catch (err) {
-                console.error("Verification error:", err);
-                alert("Something went wrong during verification.");
+                console.error("Payment error:", err);
+
+                await fetch("/api/admin/log-error", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        endpoint: "payment-handler",
+                        errorMessage: err.message,
+                        stackTrace: err.stack
+                    })
+                });
             }
         }
     };

@@ -19,6 +19,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/login-form", "/").permitAll()
                         .requestMatchers("/static/**", "/*.css", "/*.js").permitAll()
+                        .requestMatchers("/api/admin/log-error").authenticated()  // ← add this
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/home").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()

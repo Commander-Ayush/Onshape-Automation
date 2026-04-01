@@ -63,38 +63,38 @@
 
         <!-- AFTER PURCHASE MODAL -->
         <div class="receipt-modal-overlay" id="receiptModal" onclick="if(event.target === this) closeReceiptModal()">
-
             <div class="receipt-modal">
-                <!-- Close Button -->
                 <button class="modal-close" onclick="closeReceiptModal()">✕</button>
 
-                <!-- Header -->
-                <h1 class="receipt-title">🎉 Congratulations</h1>
-
-                <!-- Messages -->
-                <p class="receipt-subtitle">Your order has been received</p>
-
-                <p id="razorpay-receipt">-</p>
-
-                <p class="receipt-confirmation">
-                    You will receive a confirmation mail on:
-                    <span id="confirmed-email">-</span>
-                </p>
-
-                <!-- Referral Section -->
-                <p class="receipt-label">This is your referral code</p>
-                <h2 class="receipt-referral-code" id="userReferral">-</h2>
-
-                <p class="receipt-label" id="earn-message">
-                    Enter your UPI ID to receive money every time someone uses your referral code 😉
-                </p>
-
-                <!-- Input Section -->
-                <div class="receipt-upi-section">
-                    <input type="text" id="upiInput" class="upi-input" placeholder="@upi">
-                    <button id="upiSubmit" class="upi-submit-btn">Submit</button>
+                <div class="receipt-modal-header">
+                    <h1 class="receipt-title">🎉 Congratulations</h1>
+                    <p class="receipt-subtitle">Your order has been received</p>
                 </div>
 
+                <div class="receipt-modal-body">
+
+                    <div class="receipt-detail-row">
+                        <span class="receipt-row-label">Order ID</span>
+                        <span class="receipt-row-value" id="razorpayOrderID">—</span>
+                    </div>
+
+                    <div class="receipt-detail-row">
+                        <span class="receipt-row-label">Confirmation sent to</span>
+                        <span class="receipt-row-value" id="confirmed-email">—</span>
+                    </div>
+
+                    <div class="receipt-upi-section">
+                        <label class="receipt-row-label" for="upiInput">
+                            Earn with referrals <span class="receipt-upi-hint">— enter UPI to get paid 😉</span>
+                        </label>
+                        <div class="receipt-upi-row">
+                            <input type="text" id="upiInput" class="upi-input" placeholder="yourname@upi">
+                            <button id="upiSubmit" class="upi-submit-btn">Submit</button>
+                        </div>
+                        <p id="earn-message"></p>
+                    </div>
+
+                </div>
             </div>
         </div>
 

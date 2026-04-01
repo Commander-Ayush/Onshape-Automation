@@ -37,7 +37,9 @@ public class PaymentController {
     }
 
     @PostMapping("/create-order")
-    public ResponseEntity<?> createOrder(@RequestBody AssignmentOrder order) throws RazorpayException {
+    public ResponseEntity<?> createOrder(@RequestBody AssignmentOrder order, HttpSession session) throws RazorpayException {
+        GraphicsUser user = (GraphicsUser) session.getAttribute("user");
+        order.setUserEmail(user.getEmailAccount());
         AssignmentOrder savedOrder = payService.createOrder(order);
         return ResponseEntity.ok(savedOrder);
     }
@@ -101,7 +103,14 @@ public class PaymentController {
         if (automationResponse.getStatusCode().is2xxSuccessful()) {
             savedOrder.setStatus("completed");
             orderRepository.save(savedOrder);
-            return ResponseEntity.ok(savedOrder);
+
+            return ResponseEntity.ok(Map.of(
+                    "status",          "ok",
+                    "userReferral",    rCode.getReferralCode(),
+                    "userEmail",       user.getEmailAccount(),
+                    "razorpayOrderId", savedOrder.getRazorpayOrderId(),
+                    "commissionMoney", rCode.getDiscount() - 5
+            ));
         }
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -132,17 +141,21 @@ public class PaymentController {
     }
 
     @PostMapping("/user-s-upi")
-    public ResponseEntity<?> usersUpi(@RequestBody Referral referral) {
+    public ResponseEntity<?> usersUpi(@RequestBody Referral referral, HttpSession session) {
+        System.out.println("user-s-upi has been hit");
         Optional<Referral> ref = referralService.checkRazorpayorderId(referral.getRazorpayOrderId());
         if(ref.isPresent()) {
+            System.out.println("Razorpay Order id"+referral.getRazorpayOrderId()+" found");
             Referral customerUPI = ref.get();
             customerUPI.setUpiId(referral.getUpiId());
+
+
             referralService.saveReferral(customerUPI);
 
             return ResponseEntity.ok(Map.of("commission", customerUPI.getDiscount()));
         }
+        else System.out.println("Razorpay Order id"+referral.getRazorpayOrderId()+" not found");
         return ResponseEntity.notFound().build();
-
     }
 
 }

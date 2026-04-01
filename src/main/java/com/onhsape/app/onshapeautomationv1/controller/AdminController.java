@@ -2,11 +2,9 @@ package com.onhsape.app.onshapeautomationv1.controller;
 
 import com.onhsape.app.onshapeautomationv1.entity.Assignment;
 import com.onhsape.app.onshapeautomationv1.entity.Referral;
-import com.onhsape.app.onshapeautomationv1.repository.AppErrorRepository;
 import com.onhsape.app.onshapeautomationv1.repository.OrderRepository;
 import com.onhsape.app.onshapeautomationv1.service.AssignmentService;
 import com.onhsape.app.onshapeautomationv1.service.ImageService;
-
 import com.onhsape.app.onshapeautomationv1.service.ReferralServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -17,27 +15,26 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
-// AdminController.java
 @Controller
 public class AdminController {
 
     @Value("${file.upload.location}")
     private String scriptUploadDirectory;
 
-    private AssignmentService assignmentService;
-
+    private final AssignmentService assignmentService;
     private final ReferralServiceImpl referralServiceImpl;
+    private final OrderRepository orderRepository;
+    private final ImageService imageService;
 
-    private OrderRepository orderRepository;
-
-    private ImageService imageService;
-
-    private AppErrorRepository appErrorRepository;
+    private final List<Map<String, String>> errorLog = new ArrayList<>();
 
     public AdminController(OrderRepository orderRepository,
-                           AppErrorRepository appErrorRepository,
                            ImageService imageService,
                            AssignmentService assignmentService,
                            ReferralServiceImpl referralServiceImpl) {
@@ -45,7 +42,6 @@ public class AdminController {
         this.imageService = imageService;
         this.assignmentService = assignmentService;
         this.referralServiceImpl = referralServiceImpl;
-        this.appErrorRepository=appErrorRepository;
     }
 
     @GetMapping("/admin")
@@ -55,20 +51,19 @@ public class AdminController {
         return "admin";
     }
 
-
     @PostMapping("/admin/assignment-upload")
     @ResponseBody
-    public ResponseEntity<String> assignmentUpload
-            (@RequestParam("image") MultipartFile file,
-             @RequestParam("nameOfImage")  String imageName,
-             @RequestParam("scriptFile")  MultipartFile scriptFile,
-             @RequestParam("nameOfAssignment") String name,
-             @RequestParam("dimensionOfAssignment") String dimension,
-             @RequestParam("collegeOfAssignment") String collegeName,
-             @RequestParam("branchOfAssignment") String branch,
-             @RequestParam("priceOfAssignment") Integer price) {
+    public ResponseEntity<String> assignmentUpload(
+            @RequestParam("image") MultipartFile file,
+            @RequestParam("nameOfImage") String imageName,
+            @RequestParam("scriptFile") MultipartFile scriptFile,
+            @RequestParam("nameOfAssignment") String name,
+            @RequestParam("dimensionOfAssignment") String dimension,
+            @RequestParam("collegeOfAssignment") String collegeName,
+            @RequestParam("branchOfAssignment") String branch,
+            @RequestParam("priceOfAssignment") Integer price) {
 
-        try{
+        try {
             Assignment assignment = new Assignment();
             assignment.setNameOfAssignment(name);
             assignment.setDimensionOfAssignment(dimension);
@@ -77,69 +72,61 @@ public class AdminController {
             assignment.setPriceOfAssignment(price);
             assignment.setImageName(imageName);
 
-            System.out.println("Flow point 1");
-
-            //saving the file in Puppeteer Automations
             File dir = new File(scriptUploadDirectory);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-
-            System.out.println("Flow point 2");
+            if (!dir.exists()) dir.mkdirs();
 
             String fileName = scriptFile.getOriginalFilename();
             File targetFile = new File(scriptUploadDirectory + fileName);
 
-            // If file exists → delete it
             if (targetFile.exists()) {
                 boolean deleted = targetFile.delete();
-
-                if (!deleted) {
-                    return new ResponseEntity<>("Failed to replace existing file", HttpStatus.INTERNAL_SERVER_ERROR);
-                }
+                if (!deleted) return new ResponseEntity<>("Failed to replace existing file", HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
-            System.out.println("Flow point 3");
-            // Save new file
             scriptFile.transferTo(targetFile);
             assignment.setScriptFileName(fileName);
 
-            System.out.println("Flow point 4");
-
-            //Saving the Image on Cloudinary
             Map data = this.imageService.upload(file);
-            String imageURL = (String) data.get("url");
-            assignment.setImageURL(imageURL);
+            assignment.setImageURL((String) data.get("url"));
 
-            //Saving the assignment to the database.
             assignmentService.saveAssignment(assignment);
-
             return new ResponseEntity<>("success", HttpStatus.CREATED);
-        }catch(Exception e){
+
+        } catch (Exception e) {
             return new ResponseEntity<>("error", HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("admin/referral-code")
     public ResponseEntity<String> saveReferralCode(@RequestBody Referral referral) {
-        try{
+        try {
             referralServiceImpl.saveReferral(referral);
             return new ResponseEntity<>("success", HttpStatus.OK);
-        }catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>("error", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping("/api/admin/log-error")
+    @ResponseBody
+    public ResponseEntity<?> logError(@RequestBody Map<String, String> error) {
+        error.put("timestamp", LocalDateTime.now().toString());
+        errorLog.add(new java.util.HashMap<>(error));
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/admin/errors")
     @ResponseBody
     public ResponseEntity<?> getErrors() {
-        return ResponseEntity.ok(appErrorRepository.findAllByOrderByTimestampDesc());
+        List<Map<String, String>> reversed = new ArrayList<>(errorLog);
+        Collections.reverse(reversed);
+        return ResponseEntity.ok(reversed);
     }
 
     @DeleteMapping("/admin/errors/clear")
     @ResponseBody
     public ResponseEntity<?> clearErrors() {
-        appErrorRepository.deleteAll();
+        errorLog.clear();
         return ResponseEntity.ok().build();
     }
 }
