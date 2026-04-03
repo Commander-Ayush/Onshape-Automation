@@ -20,7 +20,7 @@ public class MailClass implements MailService {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setFrom("graphicsauto365@gmail.com");
             mailMessage.setTo(userEmail);
-            mailMessage.setSubject("Assignment Completion");
+            mailMessage.setSubject("Assignment Completed");
             mailMessage.setText("Your Onshape Assignment has been successfully completed. \n " +
                     "For any queries please contact us on " +
                     "\nInstagram GC by clicking on this link https://ig.me/j/AbayJP7UIBiBAkYZ/ \n \n"
