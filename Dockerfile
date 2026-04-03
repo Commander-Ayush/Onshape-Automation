@@ -18,7 +18,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
     gnupg \
-    # Puppeteer / Chrome runtime dependencies\
     libnss3 \
     libatk1.0-0 \
     libatk-bridge2.0-0 \
@@ -48,19 +47,16 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
 # ── Copy Node.js automation service ──────────────────────────────────────────
-# ── Copy Node.js automation service ──────────────────────────────────────────
 COPY puppeteer-automation/ ./puppeteer-automation/
 
 # Install Node deps and download Puppeteer's bundled Chromium
 WORKDIR /app/puppeteer-automation
 RUN npm ci --omit=dev
+
+ENV PUPPETEER_CACHE_DIR=/app/puppeteer-automation/.cache/puppeteer
 RUN npx puppeteer browsers install chrome
 
 WORKDIR /app
-
-# Puppeteer: use the bundled Chromium downloaded by npm ci
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false
-ENV PUPPETEER_CACHE_DIR=/app/puppeteer-automation/.cache/puppeteer
 
 EXPOSE 8080
 
