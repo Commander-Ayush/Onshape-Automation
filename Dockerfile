@@ -54,6 +54,7 @@ COPY puppeteer-automation/ ./puppeteer-automation/
 # Install Node deps and download Puppeteer's bundled Chromium
 WORKDIR /app/puppeteer-automation
 RUN npm ci --omit=dev
+RUN npx puppeteer browsers install chrome
 
 WORKDIR /app
 
