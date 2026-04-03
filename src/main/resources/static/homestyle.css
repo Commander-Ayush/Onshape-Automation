@@ -151,7 +151,7 @@ header {
 .filter-inner label {
     font-size: 11px;
     font-weight: 700;
-    text-transform: uppercase;
+    /*text-transform: uppercase;*/
     letter-spacing: 0.1em;
     color: var(--text-secondary);
     white-space: nowrap;
@@ -568,7 +568,6 @@ header.modal-open {
     font-size: 13px;
     font-weight: 700;
     color: var(--text);
-    text-transform: uppercase;
     letter-spacing: 0.07em;
 }
 
@@ -725,33 +724,35 @@ header.modal-open {
 }
 
 .receipt-modal-header {
-    padding: 2rem 1.5rem 1.2rem;
+    padding: 2rem 1.5rem 1.5rem;
     text-align: center;
     border-bottom: 1.5px solid #efefef;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
 }
 
 .receipt-title {
     font-family: 'Syne', sans-serif;
-    font-size: 22px;
+    font-size: 26px;
     font-weight: 800;
     color: var(--text);
     margin: 0;
     line-height: 1.2;
+    letter-spacing: -0.3px;
 }
 
 .receipt-subtitle {
     font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--muted);
+    font-size: 15px;
     font-weight: 400;
+    color: var(--muted);
+    margin: 0;
 }
 
 .receipt-modal-body {
-    padding: 0 1.5rem 1.6rem;
+    padding: 0 1.5rem 1.8rem;
     display: flex;
     flex-direction: column;
 }
@@ -760,9 +761,9 @@ header.modal-open {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 11px 0;
+    padding: 15px 0;
     border-bottom: 1.5px solid #efefef;
-    gap: 8px;
+    gap: 16px;
 }
 
 .receipt-row-label {
@@ -770,34 +771,47 @@ header.modal-open {
     font-size: 13px;
     font-weight: 700;
     color: var(--text);
-    text-transform: uppercase;
+    /*text-transform: uppercase;*/
     letter-spacing: 0.07em;
     flex-shrink: 0;
 }
 
 .receipt-row-value {
     font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
     color: var(--muted);
     text-align: right;
     word-break: break-all;
+    max-width: 65%;
 }
 
 /* UPI section */
 .receipt-upi-section {
-    margin-top: 14px;
+    padding-top: 20px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
+}
+
+.receipt-upi-section label.receipt-row-label {
+    display: block;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
 }
 
 .receipt-upi-hint {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
     font-weight: 400;
     color: var(--muted);
     text-transform: none;
     letter-spacing: 0;
-    font-size: 11px;
+    opacity: 0.7;
 }
 
 .receipt-upi-row {
@@ -808,15 +822,22 @@ header.modal-open {
 
 .upi-input {
     flex: 1;
+    min-width: 0;
     padding: 13px 14px;
     border-radius: 9px;
     border: 1.5px solid var(--border-strong);
     font-family: 'DM Sans', sans-serif;
     font-size: 15px;
+    font-weight: 400;
     color: var(--text);
     outline: none;
     background: var(--card-bg);
     transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.upi-input::placeholder {
+    color: var(--border-strong);
+    font-weight: 300;
 }
 
 .upi-input:focus {
@@ -826,16 +847,18 @@ header.modal-open {
 }
 
 .upi-submit-btn {
-    padding: 13px 18px;
+    flex-shrink: 0;
+    padding: 13px 20px;
     background: var(--text);
     color: #fff;
     border: none;
     border-radius: 9px;
     font-family: 'Syne', sans-serif;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
+    letter-spacing: 0.02em;
     transition: transform 0.1s, background 0.1s;
     box-shadow: 0 3px 10px rgba(15, 17, 16, 0.22);
 }
@@ -846,13 +869,16 @@ header.modal-open {
 }
 
 .upi-submit-btn:disabled {
-    opacity: 0.5;
+    opacity: 0.45;
     cursor: not-allowed;
 }
 
 #earn-message {
-    font-size: 13px;
-    color: var(--green-dark);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
     font-weight: 600;
-    min-height: 16px;
+    color: var(--green-dark);
+    min-height: 18px;
+    line-height: 1.5;
+    margin: 0;
 }

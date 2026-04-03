@@ -20,7 +20,7 @@ public class NodeAutomationStarter implements CommandLineRunner {
                 "node","server.js"
         );
 
-        builder.directory(new File("Puppeteer Automation"));
+        builder.directory(new File("puppeteer-automation"));
         builder.redirectErrorStream(true);
         builder.inheritIO();
 
