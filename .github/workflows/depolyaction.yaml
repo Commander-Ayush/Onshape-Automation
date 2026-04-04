@@ -32,13 +32,45 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            docker pull ${{ secrets.DOCKER_USERNAME }}/graphics-auto:latest
+            # Create network if it doesn't exist
+            docker network create traefik-proxy || true
+
+            # Start Traefik if not already running
+            docker inspect traefik > /dev/null 2>&1 || docker run -d \
+              --name traefik \
+              --restart unless-stopped \
+              --network traefik-proxy \
+              -p 80:80 \
+              -p 443:443 \
+              -v /var/run/docker.sock:/var/run/docker.sock:ro \
+              -v letsencrypt:/letsencrypt \
+              traefik:v3.0 \
+              --providers.docker=true \
+              --providers.docker.exposedbydefault=false \
+              --entrypoints.web.address=:80 \
+              --entrypoints.websecure.address=:443 \
+              --entrypoints.web.http.redirections.entrypoint.to=websecure \
+              --entrypoints.web.http.redirections.entrypoint.scheme=https \
+              --certificatesresolvers.letsencrypt.acme.email=graphicsauto365@gmail.com \
+              --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json \
+              --certificatesresolvers.letsencrypt.acme.httpchallenge=true \
+              --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web
+
+            # Stop and remove old app container
             docker stop graphics-auto || true
-            docker rm   graphics-auto || true
+            docker rm graphics-auto || true
+
+            # Pull latest image and run app
+            docker pull ${{ secrets.DOCKER_USERNAME }}/graphics-auto:latest
             docker run -d \
               --name graphics-auto \
               --restart unless-stopped \
-              -p 80:8080 \
+              --network traefik-proxy \
+              --label traefik.enable=true \
+              --label "traefik.http.routers.app.rule=Host(\`graphicsauto.in\`)" \
+              --label traefik.http.routers.app.entrypoints=websecure \
+              --label traefik.http.routers.app.tls.certresolver=letsencrypt \
+              --label traefik.http.services.app.loadbalancer.server.port=8080 \
               -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
               -e DATABASE_USERNAME="${{ secrets.DATABASE_USERNAME }}" \
               -e DATABASE_PASSWORD="${{ secrets.DATABASE_PASSWORD }}" \
