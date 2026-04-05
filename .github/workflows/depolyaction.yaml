@@ -32,10 +32,8 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            # Create network if it doesn't exist
             docker network create traefik-proxy || true
 
-            # Start Traefik if not already running
             docker inspect traefik > /dev/null 2>&1 || docker run -d \
               --name traefik \
               --restart unless-stopped \
@@ -44,23 +42,21 @@ jobs:
               -p 443:443 \
               -v /var/run/docker.sock:/var/run/docker.sock:ro \
               -v letsencrypt:/letsencrypt \
-              traefik:v3.0 \
+              traefik:v2.11 \
               --providers.docker=true \
               --providers.docker.exposedbydefault=false \
               --entrypoints.web.address=:80 \
               --entrypoints.websecure.address=:443 \
-              --entrypoints.web.http.redirections.entrypoint.to=websecure \
-              --entrypoints.web.http.redirections.entrypoint.scheme=https \
+              --entrypoints.web.http.redirections.entryPoint.to=websecure \
+              --entrypoints.web.http.redirections.entryPoint.scheme=https \
               --certificatesresolvers.letsencrypt.acme.email=graphicsauto365@gmail.com \
               --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json \
               --certificatesresolvers.letsencrypt.acme.httpchallenge=true \
               --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web
 
-            # Stop and remove old app container
             docker stop graphics-auto || true
             docker rm graphics-auto || true
 
-            # Pull latest image and run app
             docker pull ${{ secrets.DOCKER_USERNAME }}/graphics-auto:latest
             docker run -d \
               --name graphics-auto \
