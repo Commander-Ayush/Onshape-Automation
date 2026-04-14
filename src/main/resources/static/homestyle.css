@@ -800,7 +800,7 @@ header.modal-open {
     font-size: 13px;
     font-weight: 700;
     color: var(--text);
-    text-transform: uppercase;
+    /*text-transform: uppercase;*/
     letter-spacing: 0.08em;
 }
 

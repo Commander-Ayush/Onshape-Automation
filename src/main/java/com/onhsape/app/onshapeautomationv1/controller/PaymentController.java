@@ -40,8 +40,9 @@ public class PaymentController {
     public ResponseEntity<?> createOrder(@RequestBody AssignmentOrder order, HttpSession session) throws RazorpayException {
         GraphicsUser user = (GraphicsUser) session.getAttribute("user");
         order.setUserEmail(user.getEmailAccount());
-        AssignmentOrder savedOrder = payService.createOrder(order);
-        return ResponseEntity.ok(savedOrder);
+        AssignmentOrder createdOrder = payService.createOrder(order);
+        return ResponseEntity.ok(createdOrder);
+        //this createdOrder contains name, scriptName, price, referralCodeUsedByCustomerForThisOrder, user_sEmailId
     }
 
     @PostMapping("/referralCode")
@@ -67,8 +68,6 @@ public class PaymentController {
 
             if (isValid) {
                 return ResponseEntity.ok(Map.of("status", "verified"));
-
-
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("status", "invalid_signature"));
@@ -80,82 +79,52 @@ public class PaymentController {
     }
 
     @PostMapping("/save-order")
-    public ResponseEntity<?> saveOrder(@RequestBody AssignmentOrder order, HttpSession session) {
+    public ResponseEntity<?> saveOrderExecuteAutomationAndVerify(@RequestBody Map<String, Object> body, HttpSession session){
 
+        AssignmentOrder order = new AssignmentOrder();
         GraphicsUser user = (GraphicsUser) session.getAttribute("user");
 
-        order.setUserEmail(user.getEmailAccount());
+        order.setAssignmentName((String) body.get("assignmentName"));
+        order.setScriptFileName((String) body.get("scriptFileName"));
+        order.setPrice((Integer)  body.get("price"));
+        order.setReferralCodeUsed((String) body.get("referralCode"));
+        order.setRazorpayPaymentId((String) body.get("razorpayPaymentId"));
+        order.setRazorpayOrderId((String) body.get("razorpayOrderId"));
+        order.setUserEmail( user.getEmailAccount());
 
-        Referral rCode = userReferralCode.createReferralCode(user.getEmailAccount(), order.getPrice());
-        order.setUserReferral(rCode.getReferralCode());
-        order.setCommissionMoney(rCode.getDiscount()-5);
-        rCode.setRazorpayOrderId(order.getRazorpayOrderId());
+        Referral rCode = userReferralCode.createReferralCode(user.getEmailAccount(), (Integer)body.get("price"));
+
+        order.setUsersGeneratedReferralCode(rCode.getReferralCode());
+        rCode.setCommissionMoneyForCustomer(rCode.getDiscount()+5);
+        rCode.setRazorpayOrderId((String) body.get("razorpayOrderId"));
+        rCode.setUpiId((String) body.get("usersUpiId"));
+
         referralService.saveReferral(rCode);
-
         AssignmentOrder savedOrder = payService.saveOrder(order);
 
-        ResponseEntity<String> automationResponse = automationExecutioner.createAutomation(
+        ResponseEntity<Map<String, Object>> automationResponse = (ResponseEntity<Map<String, Object>>) automationExecutioner.createAutomation(
                 order.getScriptFileName(),
                 user.getEmailAccount(),
                 user.getPassword()
         );
 
         if (automationResponse.getStatusCode().is2xxSuccessful()) {
+            Map<String, Object> automationResponseBody = automationResponse.getBody();
+
             savedOrder.setStatus("completed");
+            savedOrder.setNumberOfAttempts((Integer) automationResponseBody.get("numberOfAttempts")); // ✅ correct key
             orderRepository.save(savedOrder);
 
-            return ResponseEntity.ok(Map.of(
-                    "status",          "ok",
-                    "userReferral",    rCode.getReferralCode(),
-                    "userEmail",       user.getEmailAccount(),
-                    "razorpayOrderId", savedOrder.getRazorpayOrderId(),
-                    "commissionMoney", rCode.getDiscount() - 5
-            ));
+            mailService.sendConfirmationMail(order.getUserEmail(), order.getUsersGeneratedReferralCode());
+
+            return ResponseEntity.ok(Map.of("status", "ok"));
         }
+        else{
+            savedOrder.setStatus("failed");
+            orderRepository.save(savedOrder);
+            return ResponseEntity.internalServerError().body(Map.of("status", "error", "message", "Automation failed"));
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("status", "error", "message", "Automation failed"));
-    }
-
-    @PostMapping("/save-order-status")
-    public ResponseEntity<?> savedOrderConfirmation(@RequestBody Map<String, String> body) {
-
-        System.out.println("Process to change the order status initiated");
-        String razorpayOrderId = body.get("razorpayOrderId");
-        String status = body.get("status");
-
-        AssignmentOrder order = orderRepository.findByRazorpayOrderId(razorpayOrderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-
-        order.setStatus(status);
-        System.out.println(order.getUserEmail());
-        System.out.println(order.getReferralCode());
-        orderRepository.save(order);
-
-        mailService.sendConfirmationMail(order.getUserEmail(), order.getUserReferral());
-
-
-        System.out.println("Change Done order created");
-
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/user-s-upi")
-    public ResponseEntity<?> usersUpi(@RequestBody Referral referral, HttpSession session) {
-        System.out.println("user-s-upi has been hit");
-        Optional<Referral> ref = referralService.checkRazorpayorderId(referral.getRazorpayOrderId());
-        if(ref.isPresent()) {
-            System.out.println("Razorpay Order id"+referral.getRazorpayOrderId()+" found");
-            Referral customerUPI = ref.get();
-            customerUPI.setUpiId(referral.getUpiId());
-
-
-            referralService.saveReferral(customerUPI);
-
-            return ResponseEntity.ok(Map.of("commission", customerUPI.getDiscount()));
         }
-        else System.out.println("Razorpay Order id"+referral.getRazorpayOrderId()+" not found");
-        return ResponseEntity.notFound().build();
     }
 
 }

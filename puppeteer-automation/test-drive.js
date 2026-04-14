@@ -41,7 +41,7 @@ async function runTestDrive(username, password) {
 
         console.log("create button clicked");
 
-        await page.waitForSelector("#canvas");
+        await page.waitForSelector("#canv");
         console.log("canvas loaded");
 
         await delay(3000);
@@ -76,13 +76,15 @@ async function runTestDrive(username, password) {
         await humanClick(723, 223, page);
 
         await page.close();
+
         console.log("test-drive completed")
+
         return { success: true };
 
     } catch (err) {
         console.error("[TEST DRIVE ERROR]", err.message);
         await page.close();
-        return { success: false, error: err.message };
+        return { success: false };
     }
 }
 

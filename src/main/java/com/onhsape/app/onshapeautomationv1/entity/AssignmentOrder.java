@@ -22,10 +22,11 @@ public class AssignmentOrder {
     private String scriptFileName;
     private Integer price;
     private String status;
-    private String referralCode;
+    private String referralCodeUsed;
     private String razorpayOrderId;
-    private String userReferral;
+    private String usersGeneratedReferralCode;
     private String userEmail;
     private String razorpayPaymentId;
     private Integer commissionMoney;
+    private Integer numberOfAttempts;
 }

@@ -24,35 +24,18 @@ function filterCards() {
 
 function openReceiptModel(razorpayOrderId, customersEmail) {
 
-
     document.getElementById('razorpayOrderID').innerText = razorpayOrderId;
     document.getElementById('confirmed-email').innerText = customersEmail;
 
-    // ← OPEN HERE, immediately
     document.getElementById('receiptModal').classList.add('active');
-    document.body.style.overflow = 'hidden';
-    document.querySelector('header').classList.add('modal-open');
 
-    const usersUpiId = document.getElementById('upiInput').value.trim();
-
-    document.getElementById('upiSubmit').onclick = async function () {
-        this.disabled = true;
-        const usersUpiId = document.getElementById('upiInput').value.trim();
-        const response = await fetch("/api/payment/user-s-upi", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                upiId: usersUpiId,
-                razorpayOrderId: razorpayOrderId
-            })
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            document.getElementById('earn-message').innerText =
-                "You'll get ₹20 every time your referral code is used";
-        }
-    }
+    return new Promise((resolve) => {
+        document.getElementById('upiSubmit').onclick = function () {
+            this.disabled = true;
+            const usersUpiId = document.getElementById('upiInput').value.trim();
+            resolve(usersUpiId);
+        };
+    });
 }
 
 function closeReceiptModal() {
@@ -119,7 +102,7 @@ async function initiateRazorpay(assignment, referral) {
     );
 
     // STEP 1: Create order
-    const response = await fetch("/api/payment/create-order", {
+    const backendAPIResponse = await fetch("/api/payment/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -132,14 +115,16 @@ async function initiateRazorpay(assignment, referral) {
 
     console.log("create-order-initiated");
 
-    const order = await response.json();
+    const order = await backendAPIResponse.json();
+
+    console.log(order);
 
     const options = {
         key: "rzp_test_SNts8h8YVvKcQU",
         amount: order.price * 100,
         currency: "INR",
         name: "Graphics Auto",
-        description: "Order for " + order.automationName,
+        description: "Order for " + order.assignmentName,
         order_id: order.razorpayOrderId,
 
         handler: async function (response) {
@@ -148,10 +133,7 @@ async function initiateRazorpay(assignment, referral) {
             const razorpayOrderId = response.razorpay_order_id;
             const razorpaySignature = response.razorpay_signature;
 
-            openReceiptModel(                                                   //OPEN RECEIPT MODEL
-                razorpayOrderId,
-                order.userEmail
-            );
+            const usersUpiId = await openReceiptModel(razorpayOrderId, order.userEmail);
 
             try {
                 const verifyResponse = await fetch("/api/payment/verify", {
@@ -180,25 +162,11 @@ async function initiateRazorpay(assignment, referral) {
                             referralCode: referral,
                             razorpayPaymentId,
                             razorpayOrderId,
-                            razorpaySignature
+                            usersUpiId
                         })
                     });
 
                     const executionResponse = await saveNExeResponse.json();
-
-                    // STEP 5: Update order status
-                    if (executionResponse.status === "ok") {
-                        console.log("Automation Ran successfully message received in the frontend");
-
-                        await fetch("/api/payment/save-order-status", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                razorpayOrderId,
-                                status: "created"
-                            })
-                        });
-                    }
 
                 } else {
                     alert("Payment verification failed. Please contact support.");

@@ -43,7 +43,6 @@ public class RazorPay implements PayService {
             assignmentOrder.setStatus(razorPayOrder.get("status"));
             assignmentOrder.setRazorpayOrderId(razorPayOrder.get("id"));
         }
-
         return assignmentOrder;
     }
 

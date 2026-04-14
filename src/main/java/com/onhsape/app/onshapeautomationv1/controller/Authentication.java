@@ -1,9 +1,11 @@
 package com.onhsape.app.onshapeautomationv1.controller;
 
 import com.onhsape.app.onshapeautomationv1.entity.Assignment;
-import com.onhsape.app.onshapeautomationv1.entity.AssignmentOrder;
+import com.onhsape.app.onshapeautomationv1.entity.FailedOrder;
 import com.onhsape.app.onshapeautomationv1.entity.GraphicsUser;
 import com.onhsape.app.onshapeautomationv1.repository.UserRepository;
+import com.onhsape.app.onshapeautomationv1.service.FailedOrderService;
+import com.onhsape.app.onshapeautomationv1.service.FailedOrderServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,9 +27,11 @@ import java.util.Map;
 public class Authentication {
 
     private final UserRepository userRepository;
+    private final FailedOrderService failedOrderService;
 
-    public Authentication(UserRepository userRepository) {
+    public Authentication(UserRepository userRepository, FailedOrderServiceImpl failedOrderService) {
         this.userRepository = userRepository;
+        this.failedOrderService = failedOrderService;
     }
 
     @Value("${test.emailId}")
@@ -35,6 +39,9 @@ public class Authentication {
 
     @Value("${test.password}")
     private String testPassword;
+
+    @Value("${MASTERS_EMAIL}")
+    private String mastersEmail;
 
     @GetMapping("/login")
     public String login(){
@@ -57,6 +64,42 @@ public class Authentication {
                         newUser.setEmailAccount(email);
                         newUser.setPassword(password);
                         newUser.setRole(GraphicsUser.Role.USER);
+                        return userRepository.save(newUser);
+                    });
+
+            // Build authority from DB role
+            String authority = "ROLE_" + user.getRole().name(); // "ROLE_USER" or "ROLE_ADMIN"
+
+            UsernamePasswordAuthenticationToken auth =
+                    new UsernamePasswordAuthenticationToken(
+                            email,
+                            null,
+                            List.of(new SimpleGrantedAuthority(authority))
+                    );
+
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            request.getSession(true).setAttribute(
+                    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                    SecurityContextHolder.getContext()
+            );
+
+            session.setAttribute("user", user);
+
+            // Redirect based on role
+            String redirectUrl = user.getRole() == GraphicsUser.Role.ADMIN ? "/admin" : "/home";
+            return ResponseEntity.ok(redirectUrl);
+        }
+
+        //for admin
+
+        String adminMail = graphicsUser.getEmailAccount();
+
+        if(email.equals(mastersEmail)){
+            GraphicsUser user = userRepository.findByEmailAccount(email)
+                    .orElseGet(() -> {
+                        GraphicsUser newUser = new GraphicsUser();
+                        newUser.setEmailAccount(email);
+                        newUser.setRole(GraphicsUser.Role.ADMIN);
                         return userRepository.save(newUser);
                     });
 
@@ -142,40 +185,6 @@ public class Authentication {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
-        }
-    }
-
-    @PostMapping("/api/authenticated/automation-script")
-    public ResponseEntity<?> runAutomation(@RequestBody Assignment assignment, HttpSession session) {
-        try {
-            GraphicsUser user = (GraphicsUser) session.getAttribute("user");
-
-            Map<String, String> body = new HashMap<>();
-            body.put("email", user.getEmailAccount());
-            body.put("password", user.getPassword());
-
-            String scriptName = assignment.getScriptFileName();
-
-            RestTemplate restTemplate = new RestTemplate();
-
-            ResponseEntity<Map> response = restTemplate.postForEntity(
-                    "http://localhost:3000/" + scriptName,
-                    body,
-                    Map.class
-            );
-
-            if (response.getStatusCode().is2xxSuccessful()) {
-                System.out.println("Automation Ran successfully");
-                return ResponseEntity.ok(Map.of("status", "ok"));
-            } else {
-                return ResponseEntity.status(response.getStatusCode())
-                        .body(Map.of("error", "Automation returned non-200"));
-
-            }
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                    .body(Map.of("error", "Node server unreachable: " + e.getMessage()));
         }
     }
 }

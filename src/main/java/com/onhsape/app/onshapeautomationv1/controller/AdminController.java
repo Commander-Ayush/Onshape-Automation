@@ -1,9 +1,12 @@
 package com.onhsape.app.onshapeautomationv1.controller;
 
 import com.onhsape.app.onshapeautomationv1.entity.Assignment;
+import com.onhsape.app.onshapeautomationv1.entity.FailedOrder;
 import com.onhsape.app.onshapeautomationv1.entity.Referral;
+import com.onhsape.app.onshapeautomationv1.repository.FailedOrdersRepo;
 import com.onhsape.app.onshapeautomationv1.repository.OrderRepository;
 import com.onhsape.app.onshapeautomationv1.service.AssignmentService;
+import com.onhsape.app.onshapeautomationv1.service.FailedOrderService;
 import com.onhsape.app.onshapeautomationv1.service.ImageService;
 import com.onhsape.app.onshapeautomationv1.service.ReferralServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,17 +34,23 @@ public class AdminController {
     private final ReferralServiceImpl referralServiceImpl;
     private final OrderRepository orderRepository;
     private final ImageService imageService;
+    private final FailedOrderService failedOrderService;
+    private final FailedOrdersRepo failedOrdersRepo;
 
     private final List<Map<String, String>> errorLog = new ArrayList<>();
 
     public AdminController(OrderRepository orderRepository,
                            ImageService imageService,
                            AssignmentService assignmentService,
-                           ReferralServiceImpl referralServiceImpl) {
+                           ReferralServiceImpl referralServiceImpl,
+                           FailedOrderService failedOrderService,
+                           FailedOrdersRepo failedOrdersRepo) {
         this.orderRepository = orderRepository;
         this.imageService = imageService;
         this.assignmentService = assignmentService;
         this.referralServiceImpl = referralServiceImpl;
+        this.failedOrderService = failedOrderService;
+        this.failedOrdersRepo =failedOrdersRepo;
     }
 
     @GetMapping("/admin")
@@ -97,36 +106,22 @@ public class AdminController {
         }
     }
 
-    @PostMapping("admin/referral-code")
-    public ResponseEntity<String> saveReferralCode(@RequestBody Referral referral) {
-        try {
-            referralServiceImpl.saveReferral(referral);
-            return new ResponseEntity<>("success", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("error", HttpStatus.BAD_REQUEST);
-        }
+    @GetMapping("/admin/failed-orders")
+    public ResponseEntity<List<FailedOrder>> getFailedOrders() {
+        return ResponseEntity.ok(failedOrderService.getAllFailedOrders());
     }
 
-    @PostMapping("/api/admin/log-error")
-    @ResponseBody
-    public ResponseEntity<?> logError(@RequestBody Map<String, String> error) {
-        error.put("timestamp", LocalDateTime.now().toString());
-        errorLog.add(new java.util.HashMap<>(error));
+    @DeleteMapping("/admin/failed-orders/{id}")
+    public ResponseEntity<?> deleteFailedOrder(@PathVariable Integer id) {
+        FailedOrder order = failedOrdersRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Not found"));
+        failedOrderService.deleteFailedOrders(order);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/admin/errors")
-    @ResponseBody
-    public ResponseEntity<?> getErrors() {
-        List<Map<String, String>> reversed = new ArrayList<>(errorLog);
-        Collections.reverse(reversed);
-        return ResponseEntity.ok(reversed);
-    }
-
-    @DeleteMapping("/admin/errors/clear")
-    @ResponseBody
-    public ResponseEntity<?> clearErrors() {
-        errorLog.clear();
+    @DeleteMapping("/admin/failed-orders")
+    public ResponseEntity<?> clearAllFailedOrders() {
+        failedOrdersRepo.deleteAll();
         return ResponseEntity.ok().build();
     }
 }

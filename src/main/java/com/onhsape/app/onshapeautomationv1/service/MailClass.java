@@ -1,6 +1,7 @@
 package com.onhsape.app.onshapeautomationv1.service;
 
 import com.onhsape.app.onshapeautomationv1.entity.AssignmentOrder;
+import com.onhsape.app.onshapeautomationv1.entity.FailedOrder;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ public class MailClass implements MailService {
     public MailClass(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
+
     @Override
     public String sendConfirmationMail(String userEmail, String referralCode) {
 
@@ -33,4 +35,25 @@ public class MailClass implements MailService {
             return e.getMessage();
         }
     }
+
+    @Override
+    public String faliureNotificationMail(String ownerEmail, FailedOrder failedOrder) {
+        try{
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
+            mailMessage.setFrom("graphicsauto365@gmail.com");
+            mailMessage.setTo(ownerEmail);
+            mailMessage.setSubject("Failed Assignment Completion");
+            mailMessage.setText("Failed Order Details\n" +
+                    failedOrder.getCustomerEmail() + "\n"+
+                    failedOrder.getOrderedAutomation() + "\n"
+            );
+            mailSender.send(mailMessage);
+            return "Mail Sent";
+        }
+        catch(Exception e){
+            return e.getMessage();
+        }
+    }
+
+
 }

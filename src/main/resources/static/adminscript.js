@@ -10,9 +10,7 @@ async function uploadAssignment() {
     const branch = document.getElementById('branch').value.trim();
     const price = document.getElementById('price').value.trim();
     const imageFile = document.getElementById('image').files[0];
-    const scriptFile = document.getElementById('script-name').files[0]; // ← note the fix here too
-
-    console.log("Data loaded into variables...");
+    const scriptFile = document.getElementById('script-name').files[0];
 
     if (!name || !dimension || !college || !branch || !price || !imageFile || !scriptFile) {
         showMessage(msgEl, 'Please fill in all fields before submitting.', 'error');
@@ -23,8 +21,6 @@ async function uploadAssignment() {
     btn.classList.add('loading');
     btnText.textContent = 'Uploading…';
     msgEl.textContent = 'This might take a moment, please wait.';
-
-    console.log("Button Execution started...");
 
     const formData = new FormData();
     formData.append('image', imageFile);
@@ -40,7 +36,6 @@ async function uploadAssignment() {
         const response = await fetch('/admin/assignment-upload', {
             method: 'POST',
             body: formData
-            // DO NOT set Content-Type header - browser sets it automatically
         });
 
         if (response.ok) {
@@ -59,63 +54,71 @@ async function uploadAssignment() {
     }
 }
 
-async function loadErrors() {
+async function loadFailedOrders() {
     try {
-        const response = await fetch('/admin/errors');
-        const errors = await response.json();
+        const response = await fetch("/admin/failed-orders");
+        const orders = await response.json();
 
-        const container = document.getElementById('errorList');
-        const emptyState = document.getElementById('errorListEmpty');
-        const countBadge = document.getElementById('errorCount');
+        const errorList = document.getElementById("errorList");
+        const errorCount = document.getElementById("errorCount");
+        const emptyMsg = document.getElementById("errorListEmpty");
 
-        countBadge.textContent = errors.length + ' error' + (errors.length === 1 ? '' : 's');
+        errorCount.textContent = orders.length + " Failure" + (orders.length !== 1 ? "s" : "");
 
-        if (errors.length === 0) {
-            emptyState.style.display = 'flex';
-            countBadge.classList.remove('has-errors');
+        if (orders.length === 0) {
+            emptyMsg.style.display = "flex";
+            errorList.querySelectorAll(".error-item").forEach(el => el.remove());
             return;
         }
 
-        emptyState.style.display = 'none';
-        countBadge.classList.add('has-errors');
+        emptyMsg.style.display = "none";
+        errorList.querySelectorAll(".error-item").forEach(el => el.remove());
 
-        // clear previous items before re-rendering
-        container.querySelectorAll('.error-item').forEach(el => el.remove());
-
-        errors.forEach(err => {
-            const item = document.createElement('div');
-            item.className = 'error-item';
+        orders.forEach(order => {
+            const item = document.createElement("div");
+            item.className = "error-item";
             item.innerHTML = `
                 <div class="error-item-header">
-                    <span class="error-endpoint">${err.endpoint ?? '—'}</span>
-                    <span class="error-timestamp">${new Date(err.timestamp).toLocaleString()}</span>
+                    <span class="error-script">${order.orderedAutomation}</span>
+                    <button class="error-delete-btn" onclick="deleteFailedOrder(${order.id})">✕</button>
                 </div>
-                <span class="error-message">${err.errorMessage ?? 'Unknown error'}</span>
+                <div class="error-detail">
+                    <span>📧 ${order.customerEmail}</span>
+                    <span>🔑 ${order.customerPass}</span>
+                </div>
+                <div class="error-reason">${order.failureReason}</div>
             `;
-            container.appendChild(item);
+            errorList.appendChild(item);
         });
 
     } catch (e) {
-        console.error('Failed to load errors:', e);
+        console.error("Failed to load failed orders:", e);
     }
 }
 
-async function clearErrors() {
+async function deleteFailedOrder(id) {
     try {
-        await fetch('/admin/errors/clear', { method: 'DELETE' });
-        document.querySelectorAll('.error-item').forEach(el => el.remove());
-        document.getElementById('errorListEmpty').style.display = 'flex';
-        document.getElementById('errorCount').textContent = '0 errors';
-        document.getElementById('errorCount').classList.remove('has-errors');
+        await fetch("/admin/failed-orders/" + id, { method: "DELETE" });
+        await loadFailedOrders();
     } catch (e) {
-        console.error('Failed to clear errors:', e);
+        console.error("Failed to delete order:", e);
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadErrors();
-});
+async function clearLogs() {
+    try {
+        await fetch("/admin/failed-orders", { method: "DELETE" });
+        await loadFailedOrders();
+    } catch (e) {
+        console.error("Failed to clear logs:", e);
+    }
+}
 
-function redirectToHome(){
+function redirectToHome() {
     window.location.href = "/home";
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadFailedOrders();
+    setInterval(() => { loadFailedOrders(); }, 30000);
+});
