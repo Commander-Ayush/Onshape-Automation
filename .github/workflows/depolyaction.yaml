@@ -68,7 +68,7 @@ jobs:
               --label traefik.http.routers.app.tls.certresolver=letsencrypt \
               --label traefik.http.services.app.loadbalancer.server.port=8080 \
               -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
-              -e MASTERS_EMAIL="${{ masters.email }}"\
+              -e MASTERS_EMAIL="${{ secrets.MASTERS_EMAIL }}"\
               -e DATABASE_USERNAME="${{ secrets.DATABASE_USERNAME }}" \
               -e DATABASE_PASSWORD="${{ secrets.DATABASE_PASSWORD }}" \
               -e API_KEY="${{ secrets.API_KEY }}" \
