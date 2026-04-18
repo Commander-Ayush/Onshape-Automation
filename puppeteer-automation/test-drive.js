@@ -41,7 +41,7 @@ async function runTestDrive(username, password) {
 
         console.log("create button clicked");
 
-        await page.waitForSelector("#canv");
+        await page.waitForSelector("#canvas");
         console.log("canvas loaded");
 
         await delay(3000);
