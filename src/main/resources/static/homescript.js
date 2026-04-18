@@ -58,7 +58,7 @@ function openModal(button) {
         name: card.querySelector('.assignment-name').innerText.trim(),
         scriptFileName: card.querySelector('#script-file-name').textContent.trim(),
         college: card.querySelector('.college-badge').textContent.trim(),
-        price: card.querySelector('.price-value span').innerText.trim(),
+        price: parseInt(card.querySelector('.price-value span').innerText.trim()), // ← add parseInt
         image: card.querySelector('.img-placeholder img').src,
         referralCode: ''
     };
@@ -197,10 +197,11 @@ document.getElementById("apply").addEventListener("click", async function () {
 
     const referralCode = document.getElementById('referralInput').value.trim();
 
+
     const response = await fetch("/api/payment/referralCode", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ referralCode })
+        body: JSON.stringify({ referralCode, price: currentAssignment.price  })
     });
 
     try {

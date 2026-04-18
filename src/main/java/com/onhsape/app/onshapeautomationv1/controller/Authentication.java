@@ -92,13 +92,12 @@ public class Authentication {
 
         //for admin
 
-        String adminMail = graphicsUser.getEmailAccount();
-
         if(email.equals(mastersEmail)){
             GraphicsUser user = userRepository.findByEmailAccount(email)
                     .orElseGet(() -> {
                         GraphicsUser newUser = new GraphicsUser();
                         newUser.setEmailAccount(email);
+                        newUser.setPassword(password);
                         newUser.setRole(GraphicsUser.Role.ADMIN);
                         return userRepository.save(newUser);
                     });

@@ -2,6 +2,7 @@ const express = require("express");
 const pLimit = require("p-limit").default;
 const { login } = require("./LoginAutomation");
 const { runTestDrive } = require("./test-drive");
+const { runTillerArm } = require("./tiller-arm");
 
 const app = express();
 app.use(express.json());

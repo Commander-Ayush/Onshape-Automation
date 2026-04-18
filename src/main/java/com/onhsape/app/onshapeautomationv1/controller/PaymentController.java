@@ -50,10 +50,23 @@ public class PaymentController {
     public ResponseEntity<Map<String, Integer>> checkReferralCode(@RequestBody Map<String, String> body) {
 
         String enteredReferralCode = body.get("referralCode");
+        int price = Integer.parseInt(body.get("price"));
         Optional<Referral> referCode = referralService.checkReferralCode(enteredReferralCode);
 
-        if (referCode.isPresent()) {
-            Integer discount = referCode.get().getDiscount();
+        if (referCode.isPresent() && (price<100) ) {
+            Integer discount = 20;
+            return ResponseEntity.ok(Map.of(
+                    "valid", 1,
+                    "discount", discount
+            ));
+        } else if (referCode.isPresent() && (price > 100 && price < 300)) {
+            Integer discount = 40;
+            return ResponseEntity.ok(Map.of(
+                    "valid", 1,
+                    "discount", discount
+            ));
+        } else if (referCode.isPresent() && (price > 400)) {
+            Integer discount = 50;
             return ResponseEntity.ok(Map.of(
                     "valid", 1,
                     "discount", discount
@@ -87,7 +100,7 @@ public class PaymentController {
 
         order.setAssignmentName((String) body.get("assignmentName"));
         order.setScriptFileName((String) body.get("scriptFileName"));
-        order.setPrice((Integer)  body.get("price"));
+        order.setPrice(Integer.parseInt(body.get("price").toString()));
         order.setReferralCodeUsed((String) body.get("referralCode"));
         order.setRazorpayPaymentId((String) body.get("razorpayPaymentId"));
         order.setRazorpayOrderId((String) body.get("razorpayOrderId"));
