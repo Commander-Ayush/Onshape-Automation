@@ -120,7 +120,7 @@ async function initiateRazorpay(assignment, referral) {
     console.log(order);
 
     const options = {
-        key: "rzp_test_SNts8h8YVvKcQU",
+        key: "rzp_live_SeqEOi57o1J9t5",
         amount: order.price * 100,
         currency: "INR",
         name: "Graphics Auto",
