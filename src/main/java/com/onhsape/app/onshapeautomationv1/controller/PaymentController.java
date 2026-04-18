@@ -41,6 +41,7 @@ public class PaymentController {
         GraphicsUser user = (GraphicsUser) session.getAttribute("user");
         order.setUserEmail(user.getEmailAccount());
         AssignmentOrder createdOrder = payService.createOrder(order);
+        System.out.println("Order created: " + createdOrder.toString());
         return ResponseEntity.ok(createdOrder);
         //this createdOrder contains name, scriptName, price, referralCodeUsedByCustomerForThisOrder, user_sEmailId
     }
