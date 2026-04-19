@@ -65,8 +65,8 @@ public class PaymentController {
                     "valid", 1,
                     "discount", discount
             ));
-        } else if (referCode.isPresent() && (price > 400)) {
-            Integer discount = 50;
+        } else if (referCode.isPresent() && (price > 500)) {
+            Integer discount = 100;
             return ResponseEntity.ok(Map.of(
                     "valid", 1,
                     "discount", discount

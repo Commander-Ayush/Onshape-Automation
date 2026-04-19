@@ -21,7 +21,6 @@ function filterCards() {
         emptyState.style.display = visibleCount === 0 ? 'flex' : 'none';
     }
 }
-
 function openReceiptModel(razorpayOrderId, customersEmail) {
 
     document.getElementById('razorpayOrderID').innerText = razorpayOrderId;
@@ -33,10 +32,20 @@ function openReceiptModel(razorpayOrderId, customersEmail) {
         document.getElementById('upiSubmit').onclick = function () {
             this.disabled = true;
             const usersUpiId = document.getElementById('upiInput').value.trim();
-            resolve(usersUpiId);
+            document.getElementById('upiInput').disabled = true;
+
+            const msg = document.getElementById('earn-message');
+            msg.innerText = '🤍 Thank you! We\'ll transfer your earnings to this UPI soon.';
+            setTimeout(() => msg.classList.add('visible'), 50);
+
+            setTimeout(() => {
+                closeReceiptModal();
+                resolve(usersUpiId);
+            }, 2200);
         };
     });
 }
+
 
 function closeReceiptModal() {
     document.getElementById('receiptModal').classList.remove('active');

@@ -62,42 +62,50 @@
     <!-- ASSIGNMENT GRID -->
     <main class="assignment-container">
 
-        <!-- AFTER PURCHASE MODAL -->
-        <div class="receipt-modal-overlay" id="receiptModal" onclick="if(event.target === this) closeReceiptModal()">
-            <div class="receipt-modal">
-                <button class="modal-close" onclick="closeReceiptModal()">✕</button>
+        <!-- AFTER PURCHASE MODAL --><div class="receipt-modal-overlay" id="receiptModal" onclick="if(event.target === this) closeReceiptModal()">
+        <div class="receipt-modal">
+            <button class="modal-close" onclick="closeReceiptModal()">✕</button>
 
-                <div class="receipt-modal-header">
-                    <h1 class="receipt-title">🎉 Congratulations</h1>
-                    <p class="receipt-subtitle">Your order has been received</p>
+            <div class="receipt-modal-header">
+                <div class="receipt-success-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M5 13l4 4L19 7" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h1 class="receipt-title">Congratulations</h1>
+                <p class="receipt-subtitle">Your order has been received</p>
+            </div>
+
+            <div class="receipt-modal-body">
+
+                <div class="receipt-detail-row">
+                    <span class="receipt-row-label">Order ID</span>
+                    <span class="receipt-row-value" id="razorpayOrderID">—</span>
                 </div>
 
-                <div class="receipt-modal-body">
-
-                    <div class="receipt-detail-row">
-                        <span class="receipt-row-label">Order ID</span>
-                        <span class="receipt-row-value" id="razorpayOrderID">—</span>
-                    </div>
-
-                    <div class="receipt-detail-row">
-                        <span class="receipt-row-label">In 3 hours confirmation will be sent to</span>
-                        <span class="receipt-row-value" id="confirmed-email">—</span>
-                    </div>
-
-                    <div class="receipt-upi-section">
-                        <label class="receipt-row-label" for="upiInput">
-                            Earn with referrals, enter UPI to get 💵
-                        </label>
-                        <div class="receipt-upi-row">
-                            <input type="text" id="upiInput" class="upi-input" placeholder="yourname@upi">
-                            <button id="upiSubmit" class="upi-submit-btn">Submit</button>
-                        </div>
-                        <p id="earn-message"></p>
-                    </div>
-
+                <div class="receipt-detail-row">
+                    <span class="receipt-row-label">Confirmation</span>
+                    <span class="receipt-confirmation-text">
+                    In 3 hours confirmation will be sent to
+                    <span id="confirmed-email">—</span>
+                </span>
                 </div>
+
+                <div class="receipt-upi-section">
+                    <label class="receipt-row-label" for="upiInput">
+                        Earn with referrals, enter UPI to get 💵
+                    </label>
+                    <p class="receipt-upi-hint">Enter your UPI ID to receive commission payouts when your referral code is used</p>
+                    <div class="receipt-upi-row">
+                        <input type="text" id="upiInput" class="upi-input" placeholder="yourname@upi">
+                        <button id="upiSubmit" class="upi-submit-btn">Submit</button>
+                    </div>
+                    <p id="earn-message"></p>
+                </div>
+
             </div>
         </div>
+    </div>
 
         <!-- ASSIGNMENT PURCHASE MODAL -->
         <div class="modal-overlay" id="purchaseModal" onclick="if(event.target===this) closeModal()">
