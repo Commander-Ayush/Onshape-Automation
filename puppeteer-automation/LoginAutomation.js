@@ -1,17 +1,10 @@
 const { getLoginBrowser } = require("./browserManager");
 
-async function login(username, user_password) {
-
-    const startTime = Date.now();
-
-    const browser = await getLoginBrowser();
+async function loginOnce(browser, username, user_password) {
     const page = await browser.newPage();
-
     try {
-
         await page.goto("https://cad.onshape.com/signin", { waitUntil: "networkidle2" });
 
-        // STEP 1: Enter Email
         await page.waitForSelector('input[name="username"]');
         await page.type('input[name="username"]', username);
         await page.keyboard.press("Enter");
@@ -22,19 +15,10 @@ async function login(username, user_password) {
         ]);
 
         if (emailStep === "email_error") {
-
-            const errorText = await page.$eval(
-                "span.osx-bubble-message",
-                el => el.textContent.trim()
-            );
-
-            console.log("Authentication Failed:", errorText);
-
             await page.close();
             return false;
         }
 
-        // STEP 2: Enter Password
         await page.type('input[name="password"]', user_password);
         await page.keyboard.press("Enter");
 
@@ -44,39 +28,38 @@ async function login(username, user_password) {
         ]);
 
         if (loginResult === "password_error") {
-
-            const errorText = await page.$eval(
-                "span.osx-bubble-message",
-                el => el.textContent.trim()
-            );
-
-            console.log("Login Failed:", errorText);
-
             await page.close();
             return false;
         }
 
-        // SUCCESS
-        if (page.url().includes("documents")) {
-
-            console.log("Login Successful");
-
-            const endTime = Date.now();
-            console.log("Execution Time:", (endTime - startTime) / 1000, "seconds");
-
-            await page.close();
-            return true;
-        }
-
+        const success = page.url().includes("documents");
         await page.close();
-        return false;
+        return success;
 
     } catch (err) {
-
-        console.log(err);
+        console.log("[loginOnce error]", err.message);
         await page.close();
         return false;
     }
+}
+
+async function login(username, user_password) {
+    const startTime = Date.now();
+    const browser = await getLoginBrowser();
+
+    const results = await Promise.all([
+        loginOnce(browser, username, user_password),
+        loginOnce(browser, username, user_password),
+        loginOnce(browser, username, user_password)
+    ]);
+
+    const success = results.some(r => r === true);
+
+    console.log("Login attempts:", results);
+    console.log("Login result:", success);
+    console.log("Execution Time:", (Date.now() - startTime) / 1000, "seconds");
+
+    return success;
 }
 
 module.exports = { login };
