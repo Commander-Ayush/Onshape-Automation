@@ -7,7 +7,7 @@ const { runTillerArm } = require("./tiller-arm");
 const app = express();
 app.use(express.json());
 
-const limit = pLimit(10);
+const limit = pLimit(6);
 
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;

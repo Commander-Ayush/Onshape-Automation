@@ -160,6 +160,8 @@ async function initiateRazorpay(assignment, referral) {
                 const result = await verifyResponse.json();
 
                 if (result.status === "verified") {
+
+                    console.log("referral going to backend:", referral);
                     // STEP 3: Save order
                     const saveNExeResponse = await fetch("/api/payment/save-order", {
                         method: "POST",

@@ -142,7 +142,7 @@ public class Authentication {
                 });
 
         // Build authority from DB role
-        String authority = "ROLE_" + user.getRole().name(); // "ROLE_USER" or "ROLE_ADMIN"
+        String authority = "ROLE_" + user.getRole().name();
 
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(

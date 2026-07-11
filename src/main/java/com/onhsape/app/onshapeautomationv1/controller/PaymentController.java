@@ -53,7 +53,14 @@ public class PaymentController {
         int price = Integer.parseInt(body.get("price"));
         Optional<Referral> referCode = referralService.checkReferralCode(enteredReferralCode);
 
-        if (referCode.isPresent() && (price<100) ) {
+        if(referCode.isPresent() && (price==2)) {
+            Integer discount = 0;
+            return ResponseEntity.ok(Map.of(
+                    "valid", 1,
+                    "discount", discount
+            ));
+        }
+        else if (referCode.isPresent() && (price<100) ) {
             Integer discount = 20;
             return ResponseEntity.ok(Map.of(
                     "valid", 1,
@@ -95,6 +102,7 @@ public class PaymentController {
     @PostMapping("/save-order")
     public ResponseEntity<?> saveOrderExecuteAutomationAndVerify(@RequestBody Map<String, Object> body, HttpSession session){
 
+        System.out.println("Save Order Called");
         AssignmentOrder order = new AssignmentOrder();
         GraphicsUser user = (GraphicsUser) session.getAttribute("user");
 
@@ -105,6 +113,8 @@ public class PaymentController {
         order.setRazorpayPaymentId((String) body.get("razorpayPaymentId"));
         order.setRazorpayOrderId((String) body.get("razorpayOrderId"));
         order.setUserEmail( user.getEmailAccount());
+
+        System.out.println("Referral Code entered by the customer is: "+order.getReferralCodeUsed());
 
         Referral rCode = userReferralCode.createReferralCode(user.getEmailAccount(), (Integer)body.get("price"));
 
