@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -49,7 +50,9 @@ public class Authentication {
     private String mastersEmail;
 
     @GetMapping("/login")
-    public String login(){
+    public String login(Model model){
+        model.addAttribute("demoEmail", testEmail);
+        model.addAttribute("demoPassword", testPassword);
         return "login";
     }
 
@@ -109,10 +112,14 @@ public class Authentication {
         return authenticateAndRespond(user, request, session);
     }
 
+    /**
+     * Builds the Spring Security auth context from a DB user, stores it in the session,
+     * and returns the role-based redirect. Shared by all three login branches above.
+     */
     private ResponseEntity<String> authenticateAndRespond(GraphicsUser user,
                                                           HttpServletRequest request,
                                                           HttpSession session) {
-        String authority = "ROLE_" + user.getRole().name();
+        String authority = "ROLE_" + user.getRole().name(); // "ROLE_USER" or "ROLE_ADMIN"
 
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(

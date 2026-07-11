@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
@@ -7,76 +7,122 @@
     <title>Sign In — Onshape</title>
     <link rel="icon" type="image/png" href="/img/favicon-16x16.png">
     <link
-        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=Mulish:wght@300;400;500&display=swap"
-        rel="stylesheet">
+            href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=Mulish:wght@300;400;500&display=swap"
+            rel="stylesheet">
     <link rel="stylesheet" th:href="@{/loginstyle.css}">
+    <style>
+        .demo-box {
+            max-width: 360px;
+            margin: 0 auto 18px auto;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            font-family: 'Mulish', sans-serif;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #4b4b63;
+        }
+
+        .demo-box strong {
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            color: #3730a3;
+        }
+
+        .demo-box .demo-creds {
+            margin-top: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .demo-box .demo-creds span {
+            font-family: monospace;
+            font-size: 12.5px;
+            background: rgba(99, 102, 241, 0.12);
+            padding: 2px 6px;
+            border-radius: 5px;
+            width: fit-content;
+        }
+    </style>
 </head>
 
 <body>
 
-    <div class="bg-shape shape-1"></div>
-    <div class="bg-shape shape-2"></div>
+<div class="bg-shape shape-1"></div>
+<div class="bg-shape shape-2"></div>
 
-    <div class="container">
-        <form id="loginForm">
+<div class="container">
 
-            <div class="brand">
-                <div class="brand-icon">⬡</div>
-                <span class="brand-name">Graphics Auto</span>
-            </div>
-
-            <div class="signup">
-                <span>Sign up</span>
-                <p class="sub">Your assignments buddy 😉</p>
-            </div>
-
-            <div class="credentials">
-                <div class="field-group">
-                    <label id="emailLabel" for="emailAddress">Onshape email</label>
-                    <div class="input-wrap">
-                        <svg class="input-icon" viewBox="0 0 20 20" fill="none">
-                            <path
-                                d="M2.5 5.5A1.5 1.5 0 014 4h12a1.5 1.5 0 011.5 1.5v9A1.5 1.5 0 0116 16H4a1.5 1.5 0 01-1.5-1.5v-9z"
-                                stroke="currentColor" stroke-width="1.2" />
-                            <path d="M2.5 6l7.5 5 7.5-5" stroke="currentColor" stroke-width="1.2"
-                                stroke-linecap="round" />
-                        </svg>
-                        <input type="email" id="emailAddress" name="emailAccount" placeholder="Your Onshape email"
-                            autocomplete="email" required>
-                    </div>
-                </div>
-
-                <div class="field-group">
-                    <label id="passwordLabel" for="Userpassword">Onshape password</label>
-                    <div class="input-wrap">
-                        <svg class="input-icon" viewBox="0 0 20 20" fill="none">
-                            <rect x="4" y="9" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2" />
-                            <path d="M7 9V6.5a3 3 0 016 0V9" stroke="currentColor" stroke-width="1.2"
-                                stroke-linecap="round" />
-                            <circle cx="10" cy="13" r="1" fill="currentColor" />
-                        </svg>
-                        <input type="password" id="Userpassword" name="password" placeholder="Your Onshape password"
-                            autocomplete="current-password" required>
-                        <button type="button" id="togglePassword"
-                            style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer;">
-                            👁
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="actions">
-                <button type="button" id="submitBtn" onclick="handleLogin()">
-                    <span class="spinner" id="spinner"></span>
-                    <span class="btn-text" id="btnText">Sign up</span>
-                </button>
-                <span class="waiting-message" id="waitingMessage"></span>
-            </div>
-
-        </form>
+    <div class="demo-box">
+        <strong>Just here to look around?</strong> No Onshape account needed —
+        sign in with the demo credentials below to explore the app.
+        <div class="demo-creds">
+            <span th:text="'Email: ' + ${demoEmail}">Email: demo@example.com</span>
+            <span th:text="'Password: ' + ${demoPassword}">Password: demo1234</span>
+        </div>
     </div>
 
-    <script th:src="@{/loginscript.js}"></script>
+    <form id="loginForm">
+
+        <div class="brand">
+            <div class="brand-icon">⬡</div>
+            <span class="brand-name">Graphics Auto</span>
+        </div>
+
+        <div class="signup">
+            <span>Sign up</span>
+            <p class="sub">Your assignments buddy 😉</p>
+        </div>
+
+        <div class="credentials">
+            <div class="field-group">
+                <label id="emailLabel" for="emailAddress">Onshape email</label>
+                <div class="input-wrap">
+                    <svg class="input-icon" viewBox="0 0 20 20" fill="none">
+                        <path
+                                d="M2.5 5.5A1.5 1.5 0 014 4h12a1.5 1.5 0 011.5 1.5v9A1.5 1.5 0 0116 16H4a1.5 1.5 0 01-1.5-1.5v-9z"
+                                stroke="currentColor" stroke-width="1.2" />
+                        <path d="M2.5 6l7.5 5 7.5-5" stroke="currentColor" stroke-width="1.2"
+                              stroke-linecap="round" />
+                    </svg>
+                    <input type="email" id="emailAddress" name="emailAccount" placeholder="Your Onshape email"
+                           autocomplete="email" required>
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label id="passwordLabel" for="Userpassword">Onshape password</label>
+                <div class="input-wrap">
+                    <svg class="input-icon" viewBox="0 0 20 20" fill="none">
+                        <rect x="4" y="9" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2" />
+                        <path d="M7 9V6.5a3 3 0 016 0V9" stroke="currentColor" stroke-width="1.2"
+                              stroke-linecap="round" />
+                        <circle cx="10" cy="13" r="1" fill="currentColor" />
+                    </svg>
+                    <input type="password" id="Userpassword" name="password" placeholder="Your Onshape password"
+                           autocomplete="current-password" required>
+                    <button type="button" id="togglePassword"
+                            style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer;">
+                        👁
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button type="button" id="submitBtn" onclick="handleLogin()">
+                <span class="spinner" id="spinner"></span>
+                <span class="btn-text" id="btnText">Sign up</span>
+            </button>
+            <span class="waiting-message" id="waitingMessage"></span>
+        </div>
+
+    </form>
+</div>
+
+<script th:src="@{/loginscript.js}"></script>
 </body>
 
 </html>
