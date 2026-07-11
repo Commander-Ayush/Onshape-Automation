@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -28,10 +29,14 @@ public class Authentication {
 
     private final UserRepository userRepository;
     private final FailedOrderService failedOrderService;
+    private final PasswordEncoder passwordEncoder;
 
-    public Authentication(UserRepository userRepository, FailedOrderServiceImpl failedOrderService) {
+    public Authentication(UserRepository userRepository,
+                          FailedOrderServiceImpl failedOrderService,
+                          PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.failedOrderService = failedOrderService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Value("${test.emailId}")
@@ -62,32 +67,12 @@ public class Authentication {
                     .orElseGet(() -> {
                         GraphicsUser newUser = new GraphicsUser();
                         newUser.setEmailAccount(email);
-                        newUser.setPassword(password);
+                        newUser.setPassword(passwordEncoder.encode(password));
                         newUser.setRole(GraphicsUser.Role.USER);
                         return userRepository.save(newUser);
                     });
 
-            // Build authority from DB role
-            String authority = "ROLE_" + user.getRole().name(); // "ROLE_USER" or "ROLE_ADMIN"
-
-            UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(
-                            email,
-                            null,
-                            List.of(new SimpleGrantedAuthority(authority))
-                    );
-
-            SecurityContextHolder.getContext().setAuthentication(auth);
-            request.getSession(true).setAttribute(
-                    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                    SecurityContextHolder.getContext()
-            );
-
-            session.setAttribute("user", user);
-
-            // Redirect based on role
-            String redirectUrl = user.getRole() == GraphicsUser.Role.ADMIN ? "/admin" : "/home";
-            return ResponseEntity.ok(redirectUrl);
+            return authenticateAndRespond(user, request, session);
         }
 
         //for admin
@@ -97,32 +82,12 @@ public class Authentication {
                     .orElseGet(() -> {
                         GraphicsUser newUser = new GraphicsUser();
                         newUser.setEmailAccount(email);
-                        newUser.setPassword(password);
+                        newUser.setPassword(passwordEncoder.encode(password));
                         newUser.setRole(GraphicsUser.Role.ADMIN);
                         return userRepository.save(newUser);
                     });
 
-            // Build authority from DB role
-            String authority = "ROLE_" + user.getRole().name(); // "ROLE_USER" or "ROLE_ADMIN"
-
-            UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(
-                            email,
-                            null,
-                            List.of(new SimpleGrantedAuthority(authority))
-                    );
-
-            SecurityContextHolder.getContext().setAuthentication(auth);
-            request.getSession(true).setAttribute(
-                    HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                    SecurityContextHolder.getContext()
-            );
-
-            session.setAttribute("user", user);
-
-            // Redirect based on role
-            String redirectUrl = user.getRole() == GraphicsUser.Role.ADMIN ? "/admin" : "/home";
-            return ResponseEntity.ok(redirectUrl);
+            return authenticateAndRespond(user, request, session);
         }
 
         //For real/actual users authentication starts from here
@@ -136,17 +101,22 @@ public class Authentication {
                 .orElseGet(() -> {
                     GraphicsUser newUser = new GraphicsUser();
                     newUser.setEmailAccount(email);
-                    newUser.setPassword(password);
+                    newUser.setPassword(passwordEncoder.encode(password));
                     newUser.setRole(GraphicsUser.Role.USER);
                     return userRepository.save(newUser);
                 });
 
-        // Build authority from DB role
+        return authenticateAndRespond(user, request, session);
+    }
+
+    private ResponseEntity<String> authenticateAndRespond(GraphicsUser user,
+                                                          HttpServletRequest request,
+                                                          HttpSession session) {
         String authority = "ROLE_" + user.getRole().name();
 
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(
-                        email,
+                        user.getEmailAccount(),
                         null,
                         List.of(new SimpleGrantedAuthority(authority))
                 );
@@ -159,10 +129,10 @@ public class Authentication {
 
         session.setAttribute("user", user);
 
-        // Redirect based on role
         String redirectUrl = user.getRole() == GraphicsUser.Role.ADMIN ? "/admin" : "/home";
         return ResponseEntity.ok(redirectUrl);
     }
+
     private boolean isValidUser(String emailAccount, String password) {
 
         try {
@@ -187,4 +157,3 @@ public class Authentication {
         }
     }
 }
-
